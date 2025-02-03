@@ -11,9 +11,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('user_id');
-            $table->string('cart_id');
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('cart_id');
             $table->decimal('total', 10, 2);
             $table->enum('status', ['pending', 'paid', 'cancelled']);
             $table->timestamps();

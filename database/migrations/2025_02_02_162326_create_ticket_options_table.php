@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('ticket_options', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('event_id');
+            $table->id();
+            $table->unsignedBigInteger('event_id');
             $table->string('type');
             $table->text('description');
             $table->timestamps();

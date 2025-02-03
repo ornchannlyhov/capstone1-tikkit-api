@@ -11,10 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('payment_transactions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('order_id');
-            $table->string('user_id');
-            $table->string('method_id');
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('method_id');
             $table->enum('status', ['pending', 'completed', 'failed']);
             $table->decimal('amount', 10, 2);
             $table->string('reference')->nullable();

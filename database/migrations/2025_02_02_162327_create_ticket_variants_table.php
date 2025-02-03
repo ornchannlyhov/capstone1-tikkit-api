@@ -11,8 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('ticket_variants', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('ticket_id');
+            $table->id();
+            $table->unsignedBigInteger('ticket_id');
             $table->string('name');
             $table->text('description');
             $table->decimal('price', 10, 2);
