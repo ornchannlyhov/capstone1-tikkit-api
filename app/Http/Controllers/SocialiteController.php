@@ -1,46 +1,46 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 class SocialiteController extends Controller
 {
     public function redirectToProvider($provider)
     {
-        return Socialite::driver($provider)->redirect();
+        $supportedProviders = ['google', 'facebook', 'github'];
+        if (!in_array($provider, $supportedProviders)) {
+            return response()->json(['error' => 'Unsupported provider'], 400);
+        }
+        $redirectUrl = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
+        return response()->json(['redirect_url' => $redirectUrl]);
     }
-
-    // Handle the callback from the provider
     public function handleProviderCallback($provider)
     {
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
-            
-            $user = User::where('email', $socialUser->getEmail())->first();
-            
-            if ($user) {
-                Auth::login($user);
-            } else {
-                // Register the user if they don't exist
+            $user = User::where('email', $socialUser->getEmail())
+                ->where('provider', $provider)
+                ->first();
+            if (!$user) {
                 $user = User::create([
                     'name' => $socialUser->getName(),
                     'email' => $socialUser->getEmail(),
                     'provider_id' => $socialUser->getId(),
                     'provider' => $provider,
-                    'password' => bcrypt('password'), 
+                    'password' => bcrypt(Str::random(24)),
                 ]);
-                Auth::login($user);
             }
-            
-            return redirect()->intended('/products');
-            
+            $token = $user->createToken('YourApp')->plainTextToken;
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => $user,
+                'token' => $token,
+            ]);
         } catch (\Exception $e) {
-            return redirect('/login')->withErrors(['error' => 'Something went wrong']);
+            return response()->json(['error' => 'Something went wrong: ' . $e->getMessage()], 500);
         }
     }
+
 }
