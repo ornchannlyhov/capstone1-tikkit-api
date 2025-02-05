@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('event_id');
             $table->string('type');
             $table->text('description');
+            $table->text('refund_policy');
             $table->timestamps();
             $table->softDeletes();
 
