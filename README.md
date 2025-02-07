@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/capstone-tikit-app-org/cp-tikit-api.git
+   git clone https://github.com/ornchannlyhov/capstone1-tikkit-api.git
    ```
 2. Navigate to the project directory:
    ```bash
