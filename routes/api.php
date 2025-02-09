@@ -19,13 +19,23 @@ Route::get('/', function () {
 
 // Authentication Routes
 Route::prefix('auth')->group(function () {
+    
+    // Social login routes
     Route::get('login/{provider}', [SocialiteController::class, 'redirectToProvider'])->name('social.login');
     Route::get('login/{provider}/callback', [SocialiteController::class, 'handleProviderCallback'])->name('social.callback');
+    
+    // Register and Login routes
     Route::post('register', [RegisteredUserController::class, 'store'])->name('register');
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login');
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('login', [AuthenticatedSessionController::class, 'userLogin'])->name('login');
+    
+    // Logout route
+    Route::post('logout', [AuthenticatedSessionController::class, 'logout'])->name('logout');
+    
+    // Password reset routes
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+    
+    // Email verification routes
     Route::get('verify-email/{id}/{hash}', [VerifyEmailController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
@@ -34,7 +44,10 @@ Route::prefix('auth')->group(function () {
         ->name('verification.send');
 });
 
-// Protected Routes
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+// Protected Routes (requires authentication)
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Fetch authenticated user
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
