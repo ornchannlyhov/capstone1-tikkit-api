@@ -14,12 +14,11 @@ class ActivityLogHelper
         $agent = new Agent();
 
         ActivityLog::create([
-            'user_id' => $user->id,
+            'user_id' => $user?->id,
             'activity' => $activity,
             'details' => $details,
             'ip_address' => $request->ip(),
             'device' => $agent->device() . ' - ' . $agent->platform() . ' - ' . $agent->browser(),
-            'date' => now(),
         ]);
     }
 }

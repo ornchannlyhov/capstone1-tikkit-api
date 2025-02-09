@@ -16,7 +16,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $user = Auth::user();
         $token = $request->user()->createToken('API Token')->plainTextToken;
-        ActivityLogHelper::logActivity($user, 'User Logged In');
+        ActivityLogHelper::logActivity($user, 'LogIn','User Logged In');
         return response()->json([
             'message' => 'Login successful',
             'user' => Auth::user(),
@@ -29,7 +29,7 @@ class AuthenticatedSessionController extends Controller
         if (!$user) {
             return response()->json(['error' => 'No authenticated user found'], 401);
         }
-        ActivityLogHelper::logActivity($user, 'User Logged Out');
+        ActivityLogHelper::logActivity($user, 'LogOut','User Logged Out');
         $user->currentAccessToken()->delete();
         return response()->json(['message' => 'Logout successful']);
     }

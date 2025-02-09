@@ -36,7 +36,7 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-        ActivityLogHelper::logActivity($user, 'User Registered');
+        ActivityLogHelper::logActivity($user, 'Register','User registered');
         Auth::login($user);
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([

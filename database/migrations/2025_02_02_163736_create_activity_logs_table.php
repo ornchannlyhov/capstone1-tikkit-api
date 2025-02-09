@@ -12,16 +12,11 @@ return new class extends Migration {
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('activity', ['login', 'purchase', 'cancellation', 'refund']);
             $table->text('description');
-            $table->date('date');
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->timestamp('created_at')->useCurrent();
         });
-
     }
 
     /**
