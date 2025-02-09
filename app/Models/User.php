@@ -49,4 +49,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(ActivityLog::class);
     }
+
+    public function isBanned()
+    {
+        return !is_null($this->banned_at);
+    }
+
+    public function ban()
+    {
+        $this->update(['banned_at' => now()]);
+    }
+    
+    public function unban()
+    {
+        $this->update(['banned_at' => null]);
+    }
 }
