@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,15 @@ Route::prefix('admin')->group(function () {
     });
 
     //Event Routes
-    
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('{id}', [EventController::class, 'show'])->name('show');
+        Route::get('create', [EventController::class, 'create'])->name('create');
+        Route::post('store', [EventController::class, 'store'])->name('store');
+        Route::put('{id}', [EventController::class, 'update'])->name('update');
+        Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::post('{id}/toggle-public', [EventController::class, 'togglePublic'])->name('togglePublic');
+    });
 });
 
 require __DIR__ . '/auth.php';

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    // list all user role based fillter
     public function index(Request $request)
     {
         $role = $request->query('role', 'buyer');
@@ -22,6 +23,8 @@ class UserController extends Controller
 
         return view('dashboard.users.create', compact('role'));
     }
+
+    // Save user to database
     public function store(Request $request, $role)
     {
         $this->validateUser($request);
@@ -31,6 +34,8 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', ucfirst($role) . ' created successfully');
     }
+
+    // Show specific user
     public function show($id)
     {
         $user = User::findOrFail($id);
@@ -41,6 +46,8 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         return view('dashboard.users.edit', compact('user'));
     }
+
+    // update a user
     public function update(Request $request, $id)
     {
         $user = user::findOrFail($id);
@@ -55,12 +62,16 @@ class UserController extends Controller
 
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
+
+    // detete a user with soft delete
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
+
+    // ban or unban a user
     public function toggleBan($id)
     {
         $user= User::findOrFail($id);
@@ -71,6 +82,8 @@ class UserController extends Controller
 
         return response()->json(['message' => "User {$action}ned successfully"]);
     }
+
+    // valitdator for user data request 
     private function validateUser(Request $request)
     {
         $request->validate([
@@ -80,6 +93,8 @@ class UserController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
     }
+
+    // create a user 
     private function createUser(Request $request, $role)
     {
         return User::create([
