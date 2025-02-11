@@ -2,51 +2,46 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Helpers\ActivityLogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function userLogin(LoginRequest $request): JsonResponse
+    /**
+     * Display the login view.
+     */
+    public function create(): View
+    {
+        return view('auth.login');
+    }
+
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-        $user = Auth::user();
-        $token = $request->user()->createToken('API Token')->plainTextToken;
 
-        ActivityLogHelper::logActivity($user, 'LogIn', 'User logged in');
+        $request->session()->regenerate();
 
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => Auth::user(),
-            'token' => $token
-        ]);
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
-    public function adminLogin(LoginRequest $loginRequest)
+    /**
+     * Destroy an authenticated session.
+     */
+    public function destroy(Request $request): RedirectResponse
     {
-        $loginRequest->authenticate();
-        $user = Auth::user();
-        if ($user->role !== 'admin') {
-            return redirect()->route('login')->withErrors(['error' => 'Unauthorized']);
-        }
-        ActivityLogHelper::logActivity($user, 'LogIn', 'Admin logged in');
-        return redirect()->route('admin.dashboard')->with('message', 'Admin login successful');
-    }
+        Auth::guard('web')->logout();
 
-    public function logout(Request $request): JsonResponse
-    {
-        $user = Auth::guard('sanctum')->user();
-        if (!$user) {
-            return response()->json(['error' => 'No authenticated user found'], 401);
-        }
+        $request->session()->invalidate();
 
-        ActivityLogHelper::logActivity($user, 'LogOut', 'User logged out');
-        $user->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logout successful']);
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }
-
