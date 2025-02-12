@@ -74,7 +74,7 @@ class UserController extends Controller
     // ban or unban a user
     public function toggleBan($id)
     {
-        $user= User::findOrFail($id);
+        $user = User::findOrFail($id);
         $action = $user->isBanned() ? 'unban' : 'ban';
         $user->{$action}();
 
@@ -82,6 +82,23 @@ class UserController extends Controller
 
         return response()->json(['message' => "User {$action}ned successfully"]);
     }
+
+    // search for a user with name or email
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $role = $request->input('role', 'buyer');
+
+        $users = User::where('role', $role)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->get();
+
+        return response()->json($users);
+    }
+
 
     // valitdator for user data request 
     private function validateUser(Request $request)

@@ -23,6 +23,8 @@ Route::prefix('admin')->group(function () {
         Route::put('{user}', [UserController::class, 'update'])->name('update');
         Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::patch('{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('toggleBan');
+        Route::get('search', [UserController::class, 'search'])->name('search');
+
     });
 
     //Event Routes
