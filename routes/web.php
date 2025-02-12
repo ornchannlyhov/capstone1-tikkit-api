@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
@@ -35,6 +36,19 @@ Route::prefix('admin')->group(function () {
         Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
         Route::post('{id}/toggle-public', [EventController::class, 'togglePublic'])->name('togglePublic');
     });
+
+    // Address Routes
+    Route::prefix('addresses')->name('addresses.')->group(function () {
+        Route::get('/', [AddressController::class, 'index'])->name('index');
+        Route::get('create', [AddressController::class, 'create'])->name('create');
+        Route::post('store', [AddressController::class, 'store'])->name('store');
+        Route::get('{address}', [AddressController::class, 'show'])->name('show');
+        Route::get('{address}/edit', [AddressController::class, 'edit'])->name('edit');
+        Route::put('{address}', [AddressController::class, 'update'])->name('update');
+        Route::delete('{address}', [AddressController::class, 'destroy'])->name('destroy');
+        Route::patch('{address}/assign-revoke', [AddressController::class, 'toggleEventAssignment'])->name('toggleEventAssignment');
+    });
+
 });
 
 require __DIR__ . '/auth.php';
