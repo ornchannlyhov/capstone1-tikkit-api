@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js']) <!-- Load styles & JS -->
+    <title>@yield('title', 'Admin Dashboard')</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <div class="flex">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
         @include('layouts.sidebar')
 
-        <div class="w-full px-6 py-4">
-            @yield('content') <!-- This ensures content is loaded properly -->
+        <div class="flex-1 flex flex-col">
+            <!-- Navbar -->
+            @include('layouts.navbar')
+
+            <!-- Page Content -->
+            <main class="p-6">
+                @yield('content')
+            </main>
         </div>
     </div>
-</body>
 
+</body>
 </html>

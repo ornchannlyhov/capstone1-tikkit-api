@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Helpers\ActivityLogHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,17 +14,16 @@ class UserController extends Controller
         $users = User::where('role', $role)->get();
         return view('dashboard.users.index', compact('users', 'role'));
     }
+   //search email
+   
+    // Show single user
     public function show($id)
-{
-    $user = User::find($id);
-    dd($user); // This should output user data or NULL if not found.
-    return view('dashboard.users.show', compact('user'));
-}
+    {
+        $user = User::findOrFail($id); // Ensures 404 if not found
+        return view('dashboard.users.show', compact('user'));
+    }
 
-  
-
-
-    // Show create form
+    // Show create user form
     public function create()
     {
         return view('dashboard.users.create');
@@ -32,15 +32,7 @@ class UserController extends Controller
     // Store new user
     public function store(Request $request)
     {
-        $request->validate([
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone_number' => 'required|numeric',
-            'gender' => 'required|in:Male,Female,Other',
-            'role' => 'required|in:admin,vendor,user',
-            'password' => 'required|min:8|confirmed',
-        ]);
+        $this->validateUser($request); // Use private validation method
 
         User::create([
             'firstname' => $request->firstname,
@@ -66,7 +58,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -88,19 +80,20 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
 
-    // ban or unban a user
+    // Ban or unban a user
     public function toggleBan($id)
     {
         $user = User::findOrFail($id);
-        $action = $user->isBanned() ? 'unban' : 'ban';
-        $user->{$action}();
+        $user->is_banned = !$user->is_banned; // Toggle is_banned column
+        $user->save();
 
-        ActivityLogHelper::logActivity($user, $action, "User was {$action}ned");
+        $action = $user->is_banned ? 'banned' : 'unbanned';
+        ActivityLogHelper::logActivity($user, $action, "User was {$action}");
 
-        return response()->json(['message' => "User {$action}ned successfully"]);
+        return response()->json(['message' => "User {$action} successfully"]);
     }
 
-    // search for a user with name or email
+    // Search users by name or email
     public function search(Request $request)
     {
         $query = $request->input('query');
@@ -108,31 +101,32 @@ class UserController extends Controller
 
         $users = User::where('role', $role)
             ->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                    ->orWhere('email', 'like', "%{$query}%");
+                $q->where('firstname', 'like', "%{$query}%")
+                  ->orWhere('lastname', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%");
             })
             ->get();
-
-        return response()->json($users);
+            return view('dashboard.users.index', compact('users', 'role'));;
     }
 
-
-    // valitdator for user data request 
+    // Validate user request
     private function validateUser(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone_number' => 'required|numeric',
             'password' => 'required|min:8|confirmed',
         ]);
     }
 
-    // create a user 
+    // Create a user (if needed elsewhere)
     private function createUser(Request $request, $role)
     {
         return User::create([
-            'name' => $request->name,
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
             'email' => $request->email,
             'phone_number' => $request->phone_number,
             'password' => bcrypt($request->password),

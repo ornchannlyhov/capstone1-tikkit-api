@@ -10,7 +10,9 @@ class ActivityLog extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'activity', 'details', 'ip_address', 'device', 'date'];
+    protected $fillable = ['user_id', 'activity', 'details', 'created_at', 'ip_address', 'device'];
+
+    public $timestamps = false; 
 
     public function user()
     {

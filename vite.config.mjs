@@ -4,7 +4,7 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
     server: {
         host: 'localhost',
-        port: 5180, // Change to a different port
+        port: 5181, // Change to a different port
         strictPort: true,
     },
     plugins: [

@@ -1,4 +1,4 @@
-<?php
+<?Php
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -15,14 +15,15 @@ class SocialiteController extends Controller
         if (!in_array($provider, $supportedProviders)) {
             return response()->json(['error' => 'Unsupported provider'], 400);
         }
-        $redirectUrl = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
+        // Ensure Socialite is correctly called
+        $redirectUrl = Socialite::driver($provider)-> redirect()->redirect()->getTargetUrl();
         return response()->json(['redirect_url' => $redirectUrl]);
     }
 
     public function handleProviderCallback($provider)
     {
         try {
-            $socialUser = Socialite::driver($provider)->stateless()->user();
+            $socialUser = Socialite::driver($provider)->redirect()->user();
             $user = User::where('email', $socialUser->getEmail())
                 ->where('provider', $provider)
                 ->first();
