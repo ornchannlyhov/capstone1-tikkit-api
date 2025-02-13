@@ -88,5 +88,55 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
 
+    // ban or unban a user
+    public function toggleBan($id)
+    {
+        $user = User::findOrFail($id);
+        $action = $user->isBanned() ? 'unban' : 'ban';
+        $user->{$action}();
 
+        ActivityLogHelper::logActivity($user, $action, "User was {$action}ned");
+
+        return response()->json(['message' => "User {$action}ned successfully"]);
+    }
+
+    // search for a user with name or email
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $role = $request->input('role', 'buyer');
+
+        $users = User::where('role', $role)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->get();
+
+        return response()->json($users);
+    }
+
+
+    // valitdator for user data request 
+    private function validateUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'phone_number' => 'required|numeric',
+            'password' => 'required|min:8|confirmed',
+        ]);
+    }
+
+    // create a user 
+    private function createUser(Request $request, $role)
+    {
+        return User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'password' => bcrypt($request->password),
+            'role' => $role,
+        ]);
+    }
 }

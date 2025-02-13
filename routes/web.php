@@ -7,30 +7,35 @@ use App\Http\Controllers\UserController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::post('login', [AuthenticatedSessionController::class, 'adminLogin'])->name('login');
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+// Admin Routes
+Route::prefix('admin')->group(function () {
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //User Routes
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('create/{role}', [UserController::class, 'create'])->name('create');
+        Route::post('store/{role}', [UserController::class, 'store'])->name('store');
+        Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
+        Route::patch('{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('toggleBan');
+    });
+
+    //Event Routes
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('{id}', [EventController::class, 'show'])->name('show');
+        Route::get('create', [EventController::class, 'create'])->name('create');
+        Route::post('store', [EventController::class, 'store'])->name('store');
+        Route::put('{id}', [EventController::class, 'update'])->name('update');
+        Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::post('{id}/toggle-public', [EventController::class, 'togglePublic'])->name('togglePublic');
+    });
 });
 
-
-
-
-require __DIR__.'/auth.php';
-
-Route::prefix('dashboard/users')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users.index');
-    Route::get('/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/store', [UserController::class, 'store'])->name('users.store');
-    Route::get('/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/{id}/update', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/{id}/delete', [UserController::class, 'destroy'])->name('users.destroy');
-    Route::get('/dashboard/users/{id}', [UserController::class, 'show'])->name('users.show');
+require __DIR__ . '/auth.php';
 
 
 });
