@@ -44,7 +44,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(PaymentTransaction::class);
     }
-
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'user_id');
+    }
     public function activityLogs()
     {
         return $this->hasMany(ActivityLog::class);
@@ -59,7 +62,7 @@ class User extends Authenticatable
     {
         $this->update(['banned_at' => now()]);
     }
-    
+
     public function unban()
     {
         $this->update(['banned_at' => null]);

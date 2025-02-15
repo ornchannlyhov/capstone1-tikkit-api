@@ -13,19 +13,29 @@ Route::get('/', function () {
 Route::post('login', [AuthenticatedSessionController::class, 'adminLogin'])->name('login');
 
 // Admin Routes
-Route::prefix('admin')->group(function () {
+Route::prefix('dasboard')->group(function () {
 
     //User Routes
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
-        Route::get('create/{role}', [UserController::class, 'create'])->name('create');
-        Route::post('store/{role}', [UserController::class, 'store'])->name('store');
-        Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
-        Route::put('{user}', [UserController::class, 'update'])->name('update');
-        Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
-        Route::patch('{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('toggleBan');
-        Route::get('search', [UserController::class, 'search'])->name('search');
+        Route::get('/create/{role}', [UserController::class, 'create'])->name('create');
+        Route::post('/store/{role}', [UserController::class, 'store'])->name('store');
+        Route::get('/{id}', [UserController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/toggle-ban', [UserController::class, 'toggleBan'])->name('toggleBan');
+        Route::get('/search', [UserController::class, 'search'])->name('search');
+    });
 
+    // Vendor Routes
+    Route::prefix('vendors')->name('vendors.')->group(function () {
+        Route::get('/', [UserController::class, 'vendorIndex'])->name('index');
+        Route::get('/create', [UserController::class, 'vendorCreate'])->name('create');
+        Route::post('/store', [UserController::class, 'vendorStore'])->name('store');
+        Route::get('/{id}/edit', [UserController::class, 'vendorEdit'])->name('edit');
+        Route::put('/{id}', [UserController::class, 'vendorUpdate'])->name('update');
+        Route::delete('/{id}', [UserController::class, 'vendorDestroy'])->name('destroy');
     });
 
     //Event Routes
