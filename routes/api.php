@@ -56,9 +56,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Profile Routes
     Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('profile.show');  
-        Route::put('/', [ProfileController::class, 'update'])->name('profile.update'); 
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.delete'); 
+        Route::get('/show', [ProfileController::class, 'edit'])->name('profile.show');  
+        Route::put('/update', [ProfileController::class, 'update'])->name('profile.update'); 
+        Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profile.delete'); 
     });
 
     // Buyer Routes
