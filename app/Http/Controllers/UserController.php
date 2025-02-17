@@ -52,6 +52,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $this->validateUpdate($request, $user);
         $user->update($request->only('name', 'email', 'phone_number', 'role'));
+        ActivityLogHelper::logActivity(auth()->user(), "update_user", "Updated user {$user->name} ({$user->id})");
         return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 
@@ -59,6 +60,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+        ActivityLogHelper::logActivity(auth()->user(), "delete_user", "Deleted user {$user->name} ({$user->id})");
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully');
     }
@@ -118,12 +120,14 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $this->validateUpdate($request, $user);
         $user->update($request->only('name', 'email', 'phone_number'));
+        ActivityLogHelper::logActivity(auth()->user(), "update_vendor", "Updated vendor {$user->name} ({$user->id})");
         return redirect()->route('users.vendorIndex')->with('success', 'Vendor updated successfully');
     }
 
     public function vendorDestroy($id)
     {
         $user = User::findOrFail($id);
+        ActivityLogHelper::logActivity(auth()->user(), "delete_vendor", "Deleted vendor {$user->name} ({$user->id})");
         $user->delete();
         return redirect()->route('users.vendorIndex')->with('success', 'Vendor deleted successfully');
     }
