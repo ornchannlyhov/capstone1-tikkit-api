@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,14 +48,21 @@ Route::prefix('auth')->group(function () {
 
 // Protected Routes (requires authentication)
 Route::middleware(['auth:sanctum'])->group(function () {
+    
     // Fetch authenticated user
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
+    // Profile Routes
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.show');  
+        Route::put('/', [ProfileController::class, 'update'])->name('profile.update'); 
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.delete'); 
+    });
+
     // Buyer Routes
     Route::prefix('buyer')->group(function () {
-
         // Get all active events
         Route::get('events', [EventController::class, 'getActiveEvents'])->name('events.index');
     });
