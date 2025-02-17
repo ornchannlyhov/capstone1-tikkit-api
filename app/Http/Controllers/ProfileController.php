@@ -10,9 +10,9 @@ use Exception;
 
 class ProfileController extends Controller
 {
-    
+
     // Get the authenticated user's profile.
-        public function edit(Request $request)
+    public function edit(Request $request)
     {
         try {
             return response()->json([
@@ -31,9 +31,9 @@ class ProfileController extends Controller
         }
     }
 
-    
+
     //  Update the user's profile information.
-        public function update(ProfileUpdateRequest $request)
+    public function update(ProfileUpdateRequest $request)
     {
         try {
             $user = $request->user();
@@ -58,7 +58,7 @@ class ProfileController extends Controller
         }
     }
 
-    
+
     // Delete the user's account.
     public function destroy(Request $request)
     {
@@ -77,11 +77,8 @@ class ProfileController extends Controller
             }
 
             $user = $request->user();
-            Auth::logout();
+            $user->tokens()->delete();
             $user->delete();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
 
             return response()->json([
                 'success' => true,
