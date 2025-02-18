@@ -4,7 +4,6 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
-
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,8 +19,11 @@ Route::prefix('admin')->group(function () {
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('create/{role}', [UserController::class, 'create'])->name('create');
-        Route::post('store/{role}', [UserController::class, 'store'])->name('store');
+        Route::post('store/{role?}', [UserController::class, 'store'])->name('store'); // ✅ Make {role} optional
         Route::get('{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('users.index');
+        Route::post('/admin/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/admin/users/create/{role}', [UserController::class, 'create'])->name('users.create');
         Route::put('{user}', [UserController::class, 'update'])->name('update');
         Route::delete('{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::patch('{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('toggleBan');

@@ -4,18 +4,29 @@ namespace App\Http\Controllers;
 use App\Helpers\ActivityLogHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     // Show all users
-    public function index(Request $request)
-    {
-        $role = $request->query('role', 'buyer');
-        $users = User::where('role', $role)->get();
-        return view('dashboard.users.index', compact('users', 'role'));
-    }
-   //search email
-   
+
+  public function index(Request $request)
+{
+    // Get the role from request, default to 'admin'
+    $role = $request->query('role', 'admin');
+
+    // Fetch users with the specified role
+    $users = User::where('role', $role)->get();
+
+    // Debugging: Check if users are being retrieved
+    // dd($users);
+
+    return view('dashboard.users.index', compact('users', 'role'));
+}
+
+
+    //search email
+
     // Show single user
     public function show($id)
     {
@@ -23,29 +34,42 @@ class UserController extends Controller
         return view('dashboard.users.show', compact('user'));
     }
 
+
+
     // Show create user form
-    public function create()
+    public function create(Request $request, $role)
     {
-        return view('dashboard.users.create');
+        return view('dashboard.users.create', compact('role'));
     }
 
-    // Store new user
-    public function store(Request $request)
-    {
-        $this->validateUser($request); // Use private validation method
 
-        User::create([
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'gender' => $request->gender,
-            'role' => $request->role,
-            'password' => bcrypt($request->password),
-        ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully!');
-    }
+
+   // Store new user - Ensure only admin can create users
+   public function store(Request $request)
+   {
+       $request->validate([
+           'name' => 'required|string|max:255',
+           'email' => 'required|email|unique:users,email',
+           'phone_number' => 'required|numeric',
+           'role' => 'required|in:admin,vendor,buyer',
+           'password' => 'required|min:8|confirmed',
+       ]);
+   
+       User::create([
+           'name' => $request->name,
+           'email' => $request->email,
+           'phone_number' => $request->phone_number,
+           'role' => $request->role,
+           'password' => bcrypt($request->password),
+       ]);
+   
+       return redirect()->route('users.index')->with('success', 'User created successfully!');
+   }
+   
+   
+   
+
 
     // Show edit form
     public function edit($id)
@@ -79,6 +103,7 @@ class UserController extends Controller
         User::findOrFail($id)->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
+    
 
     // Ban or unban a user
     public function toggleBan($id)
@@ -102,11 +127,12 @@ class UserController extends Controller
         $users = User::where('role', $role)
             ->where(function ($q) use ($query) {
                 $q->where('firstname', 'like', "%{$query}%")
-                  ->orWhere('lastname', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%");
+                    ->orWhere('lastname', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
             })
             ->get();
-            return view('dashboard.users.index', compact('users', 'role'));;
+        return view('dashboard.users.index', compact('users', 'role'));
+        ;
     }
 
     // Validate user request

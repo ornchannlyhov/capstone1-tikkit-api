@@ -14,6 +14,9 @@
                 </a>
             </li>
             <li class="py-2 px-4 hover:bg-gray-200">
+                <a href="#" class="block">👥 Vendor</a>
+            </li>
+            <li class="py-2 px-4 hover:bg-gray-200">
                 <a href="{{ route('events.index') }}" class="block {{ request()->is('admin/events*') ? 'bg-black text-white' : '' }}">
                     📅 Events
                 </a>
@@ -32,10 +35,11 @@
             <li class="py-2 px-4 hover:bg-gray-200">
                 <a href="#" class="block">📊 Analytics</a>
             </li>
+           
         </ul>
     </nav>
 
     <div class="absolute bottom-4 left-4">
-        <a href="{{ route('logout') }}" class="px-4 py-2 bg-red-500 text-white rounded">Log Out</a>
+        <a href="{{ route('logout') }}" class="px-4 py-2 bg-green-500 text-white rounded">Log Out</a>
     </div>
 </aside>

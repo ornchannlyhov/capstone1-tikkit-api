@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}"> --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
 </head>
 <body class="bg-gray-100">
 

@@ -20,6 +20,9 @@
                     </a>
                 </li>
                 <li class="py-2 px-4 hover:bg-gray-200">
+                    <a href="#" class="block"> 👤 Vendor</a>
+                </li>
+                <li class="py-2 px-4 hover:bg-gray-200">
                     <a href="{{ route('events.index') }}" class="block">📅 Events</a>
                 </li>
                 <li class="py-2 px-4 hover:bg-gray-200">
@@ -32,7 +35,7 @@
         </nav>
 
         <div class="absolute bottom-4 left-4">
-            <a href="{{ route('logout') }}" class="px-4 py-2 bg-red-500 text-white rounded">Log Out</a>
+            <a href="{{ route('logout') }}" class="px-4 py-2 bg-green-500 text-white rounded">Log Out</a>
         </div>
     </aside>
 
@@ -40,29 +43,26 @@
     <div class="flex-1 ml-64 p-6">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold text-gray-700">User Management</h1>
-            <a href="{{ route('users.create', ['role' => $role]) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <a href="{{ route('users.create', ['role' => $role]) }}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                 + Add User
             </a>
         </div>
 
         <!-- Filter Tabs -->
         <div class="flex space-x-4 mb-4">
-            <a href="{{ route('users.index', ['role' => 'admin']) }}" class="px-4 py-2 rounded-lg text-white {{ $role === 'admin' ? 'bg-gray-800' : 'bg-gray-500 hover:bg-gray-600' }}">
+            <a href="{{ route('users.index', ['role' => 'admin']) }}" class="px-4 py-2 rounded-lg text-white {{ $role === 'admin' ? 'bg-green-800' : 'bg-green-500 hover:bg-green-600' }}">
                 Admins
             </a>
-            <a href="{{ route('users.index', ['role' => 'buyer']) }}" class="px-4 py-2 rounded-lg text-white {{ $role === 'buyer' ? 'bg-gray-800' : 'bg-gray-500 hover:bg-gray-600' }}">
+            <a href="{{ route('users.index', ['role' => 'buyer']) }}" class="px-4 py-2 rounded-lg text-white {{ $role === 'buyer' ? 'bg-green-800' : 'bg-green-500 hover:bg-green-600' }}">
                 Buyers
-            </a>
-            <a href="{{ route('users.index', ['role' => 'vendor']) }}" class="px-4 py-2 rounded-lg text-white {{ $role === 'vendor' ? 'bg-gray-800' : 'bg-gray-500 hover:bg-gray-600' }}">
-                Vendors
             </a>
         </div>
 
         <!-- Search Bar -->
         <div class="flex mb-4">
-            <input type="text" id="search" placeholder="Search by user email" class="px-4 py-2 border rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-gray-400">
-            <button id="searchBtn" class="px-4 py-2 bg-gray-800 text-white rounded-r-lg hover:bg-gray-900">
-                Filter
+            <input type="text" id="search" placeholder="Search by user email" class="px-5 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">
+            <button id="searchBtn" class="ml-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                🔍 Search
             </button>
         </div>
 
@@ -71,39 +71,58 @@
             <table class="min-w-full border-collapse border">
                 <thead class="bg-green-800 text-white">
                     <tr>
-                        <th class="px-4 py-2 text-left">Email</th>
-                        <th class="px-4 py-2 text-left">Firstname</th>
-                        <th class="px-4 py-2 text-left">Lastname</th>
-                        <th class="px-4 py-2 text-left">Gender</th>
-                        <th class="px-4 py-2 text-left">Role</th>
-                        <th class="px-4 py-2 text-left">Phone</th>
-                        <th class="px-4 py-2 text-left">Created At</th>
-                        <th class="px-4 py-2 text-center">Actions</th>
+                        <th class="px-6 py-3 text-left">Name</th>
+                        <th class="px-6 py-3 text-left">Email</th>
+
+                        @if ($role === 'buyer')  
+                            <th class="px-6 py-3 text-left">Phone Number</th>
+                        @endif
+
+                        <th class="px-6 py-3 text-left">Role</th>
+
+                        @if ($role === 'admin')  
+                            <th class="px-6 py-5 text-left">Provider</th>
+                            <th class="px-6 py-5 text-left">Provider ID</th>
+                            <th class="px-6 py-5 text-left">Phone Number</th>
+                        @endif
+
+                        <th class="px-6 py-3 text-center">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="user-table-body">
                     @foreach ($users as $user)
-                    <tr class="border-b hover:bg-green-100">
-                        <td class="px-4 py-2">{{ $user->email }}</td>
-                        <td class="px-4 py-2">{{ $user->firstname }}</td>
-                        <td class="px-4 py-2">{{ $user->lastname }}</td>
-                        <td class="px-4 py-2">{{ $user->gender }}</td>
-                        <td class="px-4 py-2">{{ ucfirst($user->role) }}</td>
-                        <td class="px-4 py-2">{{ $user->phone_number }}</td>
-                        <td class="px-4 py-2">{{ $user->created_at->format('d-m-Y h:ia') }}</td>
-                        <td class="px-4 py-2 text-center flex space-x-2">
-                            <!-- Edit Button -->
-                            <a href="{{ route('users.edit', $user->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-700">
-                                ✏️
-                            </a>
-                            <!-- Delete Button -->
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-700">
-                                    🗑
+                    <tr class="border-b hover:bg-gray-100 transition duration-300">
+                        <td class="px-6 py-4 font-semibold text-gray-700">{{ $user->name ?? '-' }}</td>
+                        <td class="px-6 py-4 text-gray-600">{{ $user->email }}</td>
+
+                        @if ($role === 'buyer')
+                            <td class="px-6 py-4 text-gray-600">{{ $user->phone_number ?? '-' }}</td>
+                        @endif
+
+                        <td class="px-6 py-4 font-medium">{{ ucfirst($user->role) }}</td>
+
+                        @if ($role === 'admin')
+                            <td class="px-6 py-4 text-gray-600">{{ $user->provider ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-600">{{ $user->provider_id ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-600">{{ $user->phone_number ?? '-' }}</td>
+                        @endif
+
+                        <td class="px-6 py-4 text-center flex justify-center space-x-4">
+                            @if ($role === 'admin')
+                                <a href="{{ route('users.edit', $user->id) }}" class="px-3 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-700 transition">
+                                    ✏️ Edit
+                                </a>
+                                <button onclick="deleteUser({{ $user->id }})" 
+                                        class="px-3 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-700 transition">
+                                    🗑 Delete
                                 </button>
-                            </form>
+                            @else
+                                <button onclick="toggleBan({{ $user->id }})" 
+                                    class="px-4 py-2 text-white rounded-md shadow-md transition 
+                                    {{ $user->is_banned ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700' }}">
+                                    {{ $user->is_banned ? '✅ Unban' : '🚫 Ban' }}
+                                </button>
+                            @endif
                         </td>
                     </tr>
                     @endforeach
@@ -111,7 +130,7 @@
             </table>
 
             @if($users->isEmpty())
-            <div class="p-4 text-gray-600 text-center">
+            <div class="p-6 text-gray-600 text-center">
                 No users found.
             </div>
             @endif
@@ -123,10 +142,30 @@
 <script>
     document.getElementById('searchBtn').addEventListener('click', function() {
         let query = document.getElementById('search').value;
-        if(query.trim() !== '') {
-            window.location.href = "{{ route('users.index', ['role' => $role]) }}" + "&query=" + encodeURIComponent(query);
+        let role = "{{ $role }}"; // ✅ Get the role dynamically
+
+        if (query.trim() !== '') {
+            window.location.href = "{{ route('users.index') }}?role=" + encodeURIComponent(role) + "&query=" + encodeURIComponent(query);
         }
     });
+
+    function toggleBan(userId) {
+        fetch(`/users/${userId}/ban-toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload(); // Reload to update the status
+            } else {
+                alert("Failed to update ban status");
+            }
+        });
+    }
 </script>
 
 @endsection
