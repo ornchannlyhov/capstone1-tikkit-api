@@ -13,7 +13,7 @@ Route::get('/', function () {
 Route::post('login', [AuthenticatedSessionController::class, 'adminLogin'])->name('login');
 
 // Admin Routes
-Route::prefix('dasboard')->group(function () {
+Route::prefix('dashboard')->middleware(['admin'])->group(function () {
 
     //User Routes
     Route::prefix('users')->name('users.')->group(function () {
