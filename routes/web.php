@@ -1,21 +1,24 @@
 <?php
-
-use App\Http\Controllers\AddressController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\AddressController;
 
-// Login Route
+// Login Routes
 Route::get('/', function () {
-    return view('auth.login');
+    return redirect()->route('login');
 });
-Route::post('login', [AuthenticatedSessionController::class, 'adminLogin'])->name('login');
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::post('admin/login', [AuthenticatedSessionController::class, 'adminLogin'])->name('admin.login');
+Route::post('admin/logout', [AuthenticatedSessionController::class, 'adminLogout'])->name('admin.logout');
 
 // Admin Routes
 Route::prefix('dashboard')->middleware(['admin'])->group(function () {
-
-    //User Routes
+    // User Routes
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('/create/{role}', [UserController::class, 'create'])->name('create');
@@ -38,7 +41,7 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
         Route::delete('/{id}', [UserController::class, 'vendorDestroy'])->name('destroy');
     });
 
-    //Event Routes
+    // Event Routes
     Route::prefix('events')->name('events.')->group(function () {
         Route::get('/', [EventController::class, 'index'])->name('index');
         Route::get('{id}', [EventController::class, 'show'])->name('show');
@@ -64,4 +67,3 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
