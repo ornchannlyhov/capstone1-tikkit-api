@@ -60,11 +60,14 @@ class User extends Authenticatable
 
     public function ban()
     {
-        $this->update(['banned_at' => now()]);
+        $this->banned_at = now();
+        $this->save();
     }
 
     public function unban()
     {
-        $this->update(['banned_at' => null]);
+        $this->banned_at = null;
+        $this->save();
     }
+
 }

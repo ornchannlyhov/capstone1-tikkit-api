@@ -62,7 +62,7 @@ class AuthenticatedSessionController extends Controller
             }
 
             ActivityLogHelper::logActivity($user, 'LogIn', 'Admin logged in');
-            return redirect()->route('dashboard');
+            return redirect()->route('users.index');
         }
 
         return back()->withErrors([
