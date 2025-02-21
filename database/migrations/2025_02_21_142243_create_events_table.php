@@ -12,13 +12,17 @@ return new class extends Migration {
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->text('description');
             $table->dateTime('startDate');
             $table->dateTime('endDate');
+            $table->enum('status', ['upcoming', 'active', 'passed'])->default('upcoming');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }

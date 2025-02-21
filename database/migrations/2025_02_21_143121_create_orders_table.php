@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('cart_id');
             $table->decimal('total', 10, 2);
-            $table->enum('status', ['pending', 'paid', 'cancelled']);
+            $table->enum('status', ['pending', 'completed', 'cancelled']);
             $table->timestamps();
             $table->softDeletes();
 

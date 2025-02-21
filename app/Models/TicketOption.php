@@ -9,15 +9,28 @@ class TicketOption extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['event_id', 'type', 'refund_policy', 'description'];
+    protected $fillable = [
+        'event_id',
+        'type',
+        'refund_policy',
+        'description',
+        'price',
+        'quantity',
+        'is_active',
+    ];
 
     public function event()
     {
         return $this->belongsTo(Event::class);
     }
 
-    public function ticketVariants()
+    public function ticketOffers()
     {
-        return $this->hasMany(TicketVariant::class);
+        return $this->hasMany(TicketOffer::class);
+    }
+
+    public function purchasedTickets()
+    {
+        return $this->hasMany(PurchasedTicket::class);
     }
 }
