@@ -45,7 +45,7 @@
             <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full border-collapse border table-auto">
-                        <thead class="bg-green-800 text-white">
+                        <thead class="bg-[#030f0f] text-white">
                             <tr>
                                 <th class="px-6 py-3 text-left">Name</th>
                                 <th class="px-6 py-3 text-left">Email</th>

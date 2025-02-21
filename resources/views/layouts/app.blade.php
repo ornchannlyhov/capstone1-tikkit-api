@@ -7,8 +7,6 @@
     <title>@yield('title', 'Admin Dashboard')</title>
     <!-- assets -->
     <link rel="stylesheet" href="{{ asset('build/assets/app.css') }}">
-    <!-- tailwindcss -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- FontAwesome -->
