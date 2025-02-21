@@ -5,11 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TicketVariant extends Model
+class TicketOffer extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['ticket_id', 'name', 'description', 'price', 'quantity', 'status'];
+    protected $fillable = [
+        'ticket_id', 
+        'name', 
+        'details', 
+        'quantity', 
+    ];
 
     public function ticketOption()
     {

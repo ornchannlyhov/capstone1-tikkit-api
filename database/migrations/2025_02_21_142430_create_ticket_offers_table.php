@@ -10,16 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('carts', function (Blueprint $table) {
+        Schema::create('ticket_offers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('variant_id');
+            $table->unsignedBigInteger('ticket_id');
+            $table->string('name');
+            $table->json('details')->nullable();
             $table->decimal('quantity', 10, 2);
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('variant_id')->references('id')->on('ticket_variants')->onDelete('cascade');
+            $table->foreign('ticket_id')->references('id')->on('ticket_options')->onDelete('cascade');
         });
 
     }
@@ -29,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('carts');
+        Schema::dropIfExists('ticket_variants');
     }
 };

@@ -31,7 +31,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'userLogin'])->name('login');
     
     // Logout route
-    Route::post('logout', [AuthenticatedSessionController::class, 'logout'])->name('logout');
+    Route::post('logout', [AuthenticatedSessionController::class, 'apiLogout'])->name('logout');
     
     // Password reset routes
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');

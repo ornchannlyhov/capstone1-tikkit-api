@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,10 +11,13 @@ return new class extends Migration {
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('activity', ['login', 'purchase', 'cancellation', 'refund']);
-            $table->text('description');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->text('activity');
+            $table->string('details')->nullable();
             $table->timestamp('created_at')->useCurrent();
+            $table->string('ip_address');
+            $table->string('device');
         });
     }
 

@@ -10,20 +10,20 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('ticket_variants', function (Blueprint $table) {
+        Schema::create('ticket_options', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('ticket_id');
-            $table->string('name');
+            $table->unsignedBigInteger('event_id');
+            $table->string('type');
             $table->text('description');
-            $table->decimal('price', 10, 2);
-            $table->decimal('quantity', 10, 2);
-            $table->boolean('status');
+            $table->text('refund_policy');
+            $table->decimal('price', 8, 2);
+            $table->integer('quantity');
+            $table->boolean('is_active')->default(true); 
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('ticket_id')->references('id')->on('ticket_options')->onDelete('cascade');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });
-
     }
 
     /**
@@ -31,6 +31,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('ticket_variants');
+        Schema::dropIfExists('ticket_options');
     }
 };
