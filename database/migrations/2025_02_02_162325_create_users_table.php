@@ -14,10 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->bigInteger('phone_number')->unique()->nullable();
+            $table->bigInteger('phone_number')->nullable();
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
-            $table->enum('role', ['admin', 'vendor', 'buyer'])->default('buyer');  // Corrected line, removed change() method
+            $table->enum('role', ['admin', 'vendor', 'buyer'])->default('buyer'); 
             $table->string('provider')->nullable();
             $table->string('provider_id')->nullable();
             $table->rememberToken();

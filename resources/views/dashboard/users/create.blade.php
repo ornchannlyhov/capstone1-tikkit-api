@@ -42,11 +42,14 @@
 
                 <div>
                     <label class="block text-gray-700 text-sm font-medium mb-1">Role</label>
-                    <select name="role" disabled
+                    <select name="role"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
-                        <option value="{{ $role }}" selected>{{ ucfirst($role) }}</option>
+                        <option value="admin" {{ old('role', $role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="vendor" {{ old('role', $role) == 'vendor' ? 'selected' : '' }}>Vendor</option>
+                        <option value="buyer" {{ old('role', $role) == 'buyer' ? 'selected' : '' }}>Buyer</option>
                     </select>
                 </div>
+
                 <div>
                     <label class="block text-gray-700 text-sm font-medium mb-1">Password</label>
                     <input type="password" name="password"
