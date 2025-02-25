@@ -19,34 +19,34 @@
 
         <!-- ✅ Fix Action Here: Leave action empty (set in JS) -->
         <x-user-edit-form :action="''" :user="new \App\Models\User()" />
-             <!-- Filter Tabs -->
-    <div class="flex space-x-4 mb-4 w-full">
-        <a href="{{ route('users.index') }}"
-            class="px-4 py-2 rounded-lg text-white flex justify-center items-center space-x-2 w-full
-                {{ !request('role') ? 'bg-green-800' : 'bg-[#030f0f] hover:bg-gray-700' }}">
-            <i class="fas fa-users"></i>
-            <span>All</span>
-        </a>
-        @foreach (['buyer', 'admin', 'vendor'] as $role)
-            <a href="{{ route('users.index', ['role' => $role]) }}"
+          <!-- Filter Tabs -->
+          <div class="flex space-x-4 mb-4 w-full">
+            <a href="{{ route('users.index') }}"
                 class="px-4 py-2 rounded-lg text-white flex justify-center items-center space-x-2 w-full
-                    {{ request('role') === $role ? 'bg-green-800' : 'bg-[#030f0f] hover:bg-gray-700' }}">
+                    {{ !request('role') ? 'bg-green-800' : 'bg-[#030f0f] hover:bg-gray-700' }}">
                 <i class="fas fa-users"></i>
-                <span>{{ ucfirst($role) }}</span>
+                <span>All</span>
             </a>
-        @endforeach
-    </div>
+            @foreach (['buyer', 'admin', 'vendor'] as $role)
+                <a href="{{ route('users.index', ['role' => $role]) }}"
+                    class="px-4 py-2 rounded-lg text-white flex justify-center items-center space-x-2 w-full
+                        {{ request('role') === $role ? 'bg-green-800' : 'bg-[#030f0f] hover:bg-gray-700' }}">
+                    <i class="fas fa-users"></i>
+                    <span>{{ ucfirst($role) }}</span>
+                </a>
+            @endforeach
+        </div>
 
-    <!-- Search Bar -->
-    <div class="flex mb-4 w-full">
-        <input type="text" id="search" placeholder="Search by user email"
-            class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 w-full">
-        <button id="searchBtn"
-            class="ml-2 px-6 py-2 bg-[#030f0f] text-white rounded-lg hover:bg-gray-700 flex items-center space-x-2">
-            <i class="fas fa-search"></i>
-            <span>Search</span>
-        </button>
-    </div>
+        <!-- Search Bar -->
+        <div class="flex mb-4 w-full">
+            <input type="text" id="search" placeholder="Search by user email"
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 w-full">
+            <button id="searchBtn"
+                class="ml-2 px-6 py-2 bg-[#030f0f] text-white rounded-lg hover:bg-gray-700 flex items-center space-x-2">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </button>
+        </div>
         <!-- ✅ User Table -->
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
@@ -148,6 +148,25 @@
             console.error('Error:', error);
         });
     }
+    //Search
+    document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("searchBtn").addEventListener("click", function () {
+        let query = document.getElementById("search").value.trim();
+        if (query.length > 0) {
+            let url = new URL(window.location.href);
+            url.searchParams.set("search", query);
+            window.location.href = url.toString();
+        }
+    });
+
+    // Enable "Enter" keypress for searching
+    document.getElementById("search").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("searchBtn").click();
+        }
+    });
+});
 
     // ✅ Function to Show Success Alert
     function showSuccessAlert(message) {
