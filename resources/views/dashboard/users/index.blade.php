@@ -13,14 +13,11 @@
                 <span>Add User</span>
             </button>
         </div>
-
-        <!-- ✅ Fix Action Here: No hardcoded route -->
-        <x-user-form :action="route('users.store', ['role' => request('role', 'vendor')])" />
-
-        <!-- ✅ Fix Action Here: Leave action empty (set in JS) -->
-        <x-user-edit-form :action="''" :user="new \App\Models\User()" />
-          <!-- Filter Tabs -->
-          <div class="flex space-x-4 mb-4 w-full">
+        @include('dashboard.users.create', ['action' => route('users.store', ['role' => request('role', 'vendor')])])
+        @include('dashboard.users.edit', ['action' => '', 'user' => new \App\Models\User()])
+        
+        <!-- Filter Tabs -->
+        <div class="flex space-x-4 mb-4 w-full">
             <a href="{{ route('users.index') }}"
                 class="px-4 py-2 rounded-lg text-white flex justify-center items-center space-x-2 w-full
                     {{ !request('role') ? 'bg-green-800' : 'bg-[#030f0f] hover:bg-gray-700' }}">
@@ -47,6 +44,7 @@
                 <span>Search</span>
             </button>
         </div>
+
         <!-- ✅ User Table -->
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
@@ -127,29 +125,22 @@
                 let icon = button.querySelector("i");
                 let text = button.querySelector("span");
 
-                // ✅ Toggle Button Styles
                 if (data.is_banned) {
-                    button.classList.remove('bg-[#FD2942]', 'hover:bg-[#e52835]');
-                    button.classList.add('bg-[#00df82]', 'hover:bg-[#00b35f]');
+                    button.classList.replace('bg-[#FD2942]', 'bg-[#00df82]');
+                    button.classList.replace('hover:bg-[#e52835]', 'hover:bg-[#00b35f]');
                     icon.classList.replace('fa-ban', 'fa-check');
                     text.textContent = "Unban";
                 } else {
-                    button.classList.remove('bg-[#00df82]', 'hover:bg-[#00b35f]');
-                    button.classList.add('bg-[#FD2942]', 'hover:bg-[#e52835]');
+                    button.classList.replace('bg-[#00df82]', 'bg-[#FD2942]');
+                    button.classList.replace('hover:bg-[#00b35f]', 'hover:bg-[#e52835]');
                     icon.classList.replace('fa-check', 'fa-ban');
                     text.textContent = "Ban";
                 }
-
-                // ✅ Show Success Alert
-                showSuccessAlert(data.message);
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+        .catch(error => console.error('Error:', error));
     }
-    //Search
-    document.addEventListener("DOMContentLoaded", function () {
+
     document.getElementById("searchBtn").addEventListener("click", function () {
         let query = document.getElementById("search").value.trim();
         if (query.length > 0) {
@@ -159,53 +150,39 @@
         }
     });
 
-    // Enable "Enter" keypress for searching
-    document.getElementById("search").addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            document.getElementById("searchBtn").click();
+    
+document.addEventListener('DOMContentLoaded', function () {
+    // ✅ Open Edit Modal and Populate Data
+    window.openEditUserModal = function (id, name, email, phone, role) {
+        document.getElementById('editUserModal').classList.remove('hidden');
+
+        // Populate form fields with user data
+        document.querySelector('#editUserModal input[name="name"]').value = name;
+        document.querySelector('#editUserModal input[name="email"]').value = email;
+        document.querySelector('#editUserModal input[name="phone_number"]').value = phone || '';
+        document.querySelector('#editUserModal select[name="role"]').value = role;
+
+        // Update form action with correct user ID
+        let form = document.querySelector('#editUserModal form');
+        form.action = `/dashboard/users/${id}`; // Update this to match your route
+    };
+
+    // ✅ Close Modal on Button Click
+    document.querySelectorAll('[data-modal-hide="editUserModal"]').forEach(button => {
+        button.addEventListener('click', function () {
+            document.getElementById('editUserModal').classList.add('hidden');
+        });
+    });
+
+    // ✅ Close Modal When Clicking Outside
+    document.getElementById('editUserModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+            this.classList.add('hidden');
         }
     });
 });
 
-    // ✅ Function to Show Success Alert
-    function showSuccessAlert(message) {
-        let alertBox = document.createElement('div');
-        alertBox.id = "success-alert";
-        alertBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center p-4 text-green-800 border border-green-300 rounded-lg bg-green-100 dark:bg-green-200 dark:text-green-900 shadow-lg opacity-100 transition-all duration-500 ease-in-out";
-        alertBox.innerHTML = `
-            <svg class="w-5 h-5 text-green-700 dark:text-green-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-3a1 1 0 1 0-2 0v4a1 1 0 0 0 2 0V7Zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/>
-            </svg>
-            <span class="ml-3 text-sm font-medium">${message}</span>
-        `;
 
-        document.body.appendChild(alertBox);
-
-        // ✅ Hide and remove after 3 seconds
-        setTimeout(() => {
-            alertBox.style.transition = "opacity 0.5s, transform 0.5s ease-in-out";
-            alertBox.style.opacity = "0";
-            alertBox.style.transform = "translate(-50%, -20px)";
-            setTimeout(() => alertBox.remove(), 500);
-        }, 3000);
-    }
-    function openEditUserModal(userId, name, email, phoneNumber, role) {
-        let form = document.querySelector("#editUserModal form");
-        if (!form) return;
-
-        // ✅ Set the correct action dynamically
-        form.action = `/dashboard/users/${userId}`;
-
-        // ✅ Populate form fields with user data
-        form.querySelector("input[name='name']").value = name;
-        form.querySelector("input[name='email']").value = email;
-        form.querySelector("input[name='phone_number']").value = phoneNumber || "";
-        form.querySelector("select[name='role']").value = role;
-
-        // ✅ Show the modal
-        document.getElementById("editUserModal").classList.remove("hidden");
-    }
 </script>
 
 @endsection
