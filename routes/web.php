@@ -64,6 +64,7 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
         Route::post('store', [EventController::class, 'store'])->name('store');
         Route::put('{id}', [EventController::class, 'update'])->name('update');
         Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
+        Route::get('search', [EventController::class, 'search'])->name('search');
         Route::post('{id}/toggle-public', [EventController::class, 'togglePublic'])->name('togglePublic');
     });
 
@@ -91,12 +92,12 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
 
     // TicketOffer Routes
     Route::prefix('ticket-offers')->name('ticketOffers.')->group(function () {
-        Route::get('ticket-option/{ticketOptionId}', [TicketOfferController::class, 'index'])->name('index');  
-        Route::get('ticket-option/{ticketOptionId}/create', [TicketOfferController::class, 'create'])->name('create');  
-        Route::post('ticket-option/{ticketOptionId}/store', [TicketOfferController::class, 'store'])->name('store');  
-        Route::get('edit/{ticketOfferId}', [TicketOfferController::class, 'edit'])->name('edit'); 
-        Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update'); 
-        Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy'); 
+        Route::get('ticket-option/{ticketOptionId}', [TicketOfferController::class, 'index'])->name('index');
+        Route::get('ticket-option/{ticketOptionId}/create', [TicketOfferController::class, 'create'])->name('create');
+        Route::post('ticket-option/{ticketOptionId}/store', [TicketOfferController::class, 'store'])->name('store');
+        Route::get('edit/{ticketOfferId}', [TicketOfferController::class, 'edit'])->name('edit');
+        Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update');
+        Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy');
     });
 
     // Purchased Ticket Route
