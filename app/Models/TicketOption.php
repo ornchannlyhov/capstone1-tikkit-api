@@ -33,4 +33,13 @@ class TicketOption extends Model
     {
         return $this->hasMany(PurchasedTicket::class);
     }
+
+    public function reduceQuantity($amount = 1)
+    {
+        if ($this->quantity >= $amount) {
+            $this->decrement('quantity', $amount);
+        } else {
+            throw new \Exception("Not enough tickets available");
+        }
+    }
 }
