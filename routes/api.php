@@ -66,10 +66,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('buyer')->group(function () {
         // Get all active events
         Route::get('events', [EventController::class, 'getActiveEvents'])->name('events.index');
+
+        // Search for events
+        Route::get('events/search', [EventController::class, 'search'])->name('events.search');
+
         // Get all purchased tickets for the buyer
         Route::get('purchased-tickets', [PurchasedTicketController::class, 'viewPurchasedTicketsForBuyer'])->name('api.view.purchased.tickets');
+
         // Validate purchased ticket
         Route::post('validate-ticket', [PurchasedTicketController::class, 'validateQR'])->name('api.validate.ticket');
-
     });
 });

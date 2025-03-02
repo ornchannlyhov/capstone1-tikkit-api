@@ -31,12 +31,16 @@ class EventController extends Controller
         }
     }
 
-    // Web: List all events with filter by status (default 'active')
+    // Web: List all events with no status filter by default
     public function index(Request $request)
     {
         try {
-            $status = $request->query('status', 'active');
-            $events = Event::where('status', $status)->get();
+            $status = $request->query('status', null);
+            $eventsQuery = Event::query();
+            if ($status) {
+                $eventsQuery->where('status', $status);
+            }
+            $events = $eventsQuery->get();
             return view('dashboard.events.index', compact('events', 'status'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Error fetching events.');
@@ -149,6 +153,35 @@ class EventController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating event status.',
+                'error' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
+    }
+
+    // API/Web: Search events based on name or description
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->query('search');
+            $events = Event::where('name', 'like', "%$query%")
+                ->orWhere('description', 'like', "%$query%")
+                ->get();
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Search results retrieved successfully.',
+                    'data' => $events,
+                    'status' => 200
+                ]);
+            } else {
+                return view('dashboard.events.index', compact('events'));
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching events.',
                 'error' => $e->getMessage(),
                 'status' => 500
             ]);
