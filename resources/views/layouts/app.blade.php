@@ -14,11 +14,19 @@
     <!-- font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+    <!-- ✅ Flowbite JS (Required for modals) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
 
+</head>
+   <!-- #region -->
 <body class="bg-gray-100">
+    <x-alert :message="session('success')" />
+
+
+
 
     <div class="flex h-screen">
+        
         <!-- Sidebar -->
         @include('layouts.sidebar')
 
