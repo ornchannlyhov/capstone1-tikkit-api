@@ -57,7 +57,7 @@ class SocialiteController extends Controller
                     'email' => $socialUser->getEmail(),
                     'provider_id' => $socialUser->getId(),
                     'provider' => $provider,
-                    'password' => bcrypt(Str::random(24)), // Random password for security
+                    'password' => bcrypt(Str::random(24)),
                 ]);
 
                 ActivityLogHelper::logActivity($user, "User Registered via {$provider}");
@@ -66,7 +66,7 @@ class SocialiteController extends Controller
             }
 
             // Generate API token
-            $token = $user->createToken('YourApp')->plainTextToken;
+            $token = $user->createToken('API Token')->plainTextToken;
 
             return response()->json([
                 'message' => 'Login successful',
