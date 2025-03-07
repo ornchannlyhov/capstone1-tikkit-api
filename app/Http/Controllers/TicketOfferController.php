@@ -7,6 +7,22 @@ use Illuminate\Http\Request;
 
 class TicketOfferController extends Controller
 {
+    // Vendor: View only their own ticket offers
+    public function vendorIndex($ticketOptionId)
+    {
+        try {
+            $vendorId = auth()->id();
+
+            $ticketOption = TicketOption::whereHas('event', function ($query) use ($vendorId) {
+                $query->where('user_id', $vendorId);
+            })->findOrFail($ticketOptionId);
+            $ticketOffers = $ticketOption->ticketOffers()->paginate(10);
+
+            return view('dashboard.ticketOffers.vendor_index', compact('ticketOffers', 'ticketOption'));
+        } catch (\Exception $e) {
+            return redirect()->route('events.index')->with('error', 'You do not have permission to view these ticket offers.');
+        }
+    }
     // Display all offers for a specific ticket option
     public function index($ticketOptionId)
     {

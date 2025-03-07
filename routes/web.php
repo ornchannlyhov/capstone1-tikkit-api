@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PurchasedTicketController;
 use App\Http\Controllers\TicketOfferController;
 use App\Http\Controllers\TicketOptionController;
@@ -91,17 +92,23 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
 
     // TicketOffer Routes
     Route::prefix('ticket-offers')->name('ticketOffers.')->group(function () {
-        Route::get('ticket-option/{ticketOptionId}', [TicketOfferController::class, 'index'])->name('index');  
-        Route::get('ticket-option/{ticketOptionId}/create', [TicketOfferController::class, 'create'])->name('create');  
-        Route::post('ticket-option/{ticketOptionId}/store', [TicketOfferController::class, 'store'])->name('store');  
-        Route::get('edit/{ticketOfferId}', [TicketOfferController::class, 'edit'])->name('edit'); 
-        Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update'); 
-        Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy'); 
+        Route::get('ticket-option/{ticketOptionId}', [TicketOfferController::class, 'index'])->name('index');
+        Route::get('ticket-option/{ticketOptionId}/create', [TicketOfferController::class, 'create'])->name('create');
+        Route::post('ticket-option/{ticketOptionId}/store', [TicketOfferController::class, 'store'])->name('store');
+        Route::get('edit/{ticketOfferId}', [TicketOfferController::class, 'edit'])->name('edit');
+        Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update');
+        Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy');
+    });
+    // Purchased Ticket Route
+    Route::get('purchased-tickets/{ticketOptionId}', [PurchasedTicketController::class, 'viewPurchasedTicketsForAdmin'])->name('purchasedTickets.index');
+
+    // Order management Route 
+    Route::prefix('admin/orders')->middleware(['auth', 'role:admin'])->name('admin.orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('{id}', [OrderController::class, 'show'])->name('show');
+        Route::get('cancellation-requests', [OrderController::class, 'viewCancellationRequests'])->name('cancellation-requests');
     });
 
-    // Purchased Ticket Route
-
-    Route::get('purchased-tickets/{ticketOptionId}', [PurchasedTicketController::class, 'viewPurchasedTicketsForAdmin'])->name('purchasedTickets.index');
 });
 
 require __DIR__ . '/auth.php';

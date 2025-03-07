@@ -30,6 +30,37 @@ class EventController extends Controller
             ]);
         }
     }
+    // API: Get events for the authenticated vendor
+    public function getVendorEvents(Request $request)
+    {
+        try {
+            $vendor = auth()->user();
+
+            if ($vendor->role !== 'vendor') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.',
+                    'status' => 403
+                ]);
+            }
+
+            $events = Event::where('user_id', $vendor->id)->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendor events retrieved successfully.',
+                'data' => $events,
+                'status' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching vendor events.',
+                'error' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
+    }
 
     // Web: List all events with filter by status (default 'active')
     public function index(Request $request)
