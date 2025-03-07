@@ -1,4 +1,4 @@
-@props(['action', 'role' => 'vendor']) <!-- Set default role to 'vendor' -->
+@props(['action', 'role' => 'vendor'])  <!-- Set default role to 'vendor' -->
 
 
 <!-- ✅ Flowbite Modal -->
@@ -8,7 +8,8 @@
         <div class="bg-white rounded-lg shadow-lg">
 
             <!-- 🔹 Close Button -->
-            <button type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+            <button type="button"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
                 data-modal-hide="userModal">
                 <i class="fas fa-times"></i>
             </button>
@@ -37,23 +38,20 @@
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Full Name</label>
-                        <input type="text" name="name" value="{{ old('name') }}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                            required>
+                        <input type="text" name="name" value="{{ old('name') }}
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Email</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                            required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Phone Number</label>
                         <input type="text" name="phone_number" value="{{ old('phone_number') }}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                            required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
                     <div>
                         <label class="block text-gray-700 text-sm font-medium mb-1">Role</label>
@@ -68,15 +66,13 @@
                     <div>
                         <label class="block text-dark text-sm font-medium">Password</label>
                         <input type="password" name="password"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                            required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Confirm Password</label>
                         <input type="password" name="password_confirmation"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
-                            required>
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
 
                     <button type="submit"

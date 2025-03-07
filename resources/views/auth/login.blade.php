@@ -21,7 +21,7 @@
                     <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="mengthong@gmail.com">
+                        placeholder=" Enter your email">
                     @error('email')
                         <span class="text-red-500 text-xs italic">{{ $message }}</span>
                     @enderror
@@ -31,7 +31,7 @@
                     <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
                     <input type="password" id="password" name="password" required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-200"
-                        placeholder="*********">
+                        placeholder="Enter your password">
                     @error('password')
                         <span class="text-red-500 text-xs italic">{{ $message }}</span>
                     @enderror

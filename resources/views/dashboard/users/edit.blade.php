@@ -8,7 +8,9 @@
         <div class="bg-white rounded-lg shadow-lg">
 
             <!-- 🔹 Close Button -->
-            <button type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+
+            <button type="button"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
                 data-modal-hide="editUserModal">
                 <i class="fas fa-times"></i>
             </button>
@@ -60,18 +62,16 @@
                         <label class="block text-gray-700 text-sm font-medium mb-1">Role</label>
                         <select name="role"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
-                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin
-                            </option>
-                            <option value="vendor" {{ old('role', $user->role) == 'vendor' ? 'selected' : '' }}>Vendor
-                            </option>
-                            <option value="buyer" {{ old('role', $user->role) == 'buyer' ? 'selected' : '' }}>Buyer
-                            </option>
+
+                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                            <option value="vendor" {{ old('role', $user->role) == 'vendor' ? 'selected' : '' }}>Vendor</option>
+                            <option value="buyer" {{ old('role', $user->role) == 'buyer' ? 'selected' : '' }}>Buyer</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-dark text-sm font-medium">New Password (Leave empty to keep current
-                            password)</label>
+
+                        <label class="block text-dark text-sm font-medium">New Password (Leave empty to keep current password)</label>
                         <input type="password" name="password"
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200"
                             placeholder="Enter at least 8 characters" minlength="8">
@@ -92,4 +92,5 @@
             </div>
         </div>
     </div>
+
 </div>
