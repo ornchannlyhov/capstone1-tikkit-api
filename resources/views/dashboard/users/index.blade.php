@@ -160,7 +160,6 @@ function showSuccessAlert(message) {
         </svg>
         <span class="ml-3 text-sm font-medium">${message}</span>
     `;
-
     document.body.appendChild(alertBox);
 
     // ✅ Hide and remove after 3 seconds
@@ -214,8 +213,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-
 </script>
-
 @endsection

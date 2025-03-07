@@ -9,7 +9,7 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'variant_id', 'quantity'];
+    protected $fillable = ['user_id', 'ticket_id', 'quantity'];
 
     public function user()
     {
@@ -18,6 +18,6 @@ class Cart extends Model
 
     public function ticketVariant()
     {
-        return $this->belongsTo(TicketVariant::class, 'variant_id');
+        return $this->belongsTo(TicketOption::class, 'ticket_id');
     }
 }
