@@ -2,11 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\TicketOption;
 use Illuminate\Http\Request;
 
 class TicketOptionController extends Controller
 {
+    // Vendor: View only their own ticket options
+    public function vendorIndex($eventId)
+    {
+        try {
+            $vendorId = auth()->id();
+            $event = Event::where('id', $eventId)->where('user_id', $vendorId)->firstOrFail();
+            $ticketOptions = TicketOption::where('event_id', $event->id)->get();
+            return view('dashboard.ticketOptions.vendor_index', compact('ticketOptions', 'event'));
+        } catch (\Exception $e) {
+            return redirect()->route('events.index')->with('error', 'You do not have permission to view these ticket options.');
+        }
+    }
     // Show all TicketOptions for an event
     public function index($id)
     {

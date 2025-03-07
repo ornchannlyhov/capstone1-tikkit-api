@@ -36,30 +36,11 @@
                 <form action="{{ $action }}" method="POST" class="space-y-4">
                     @csrf
 
-<<<<<<< HEAD
-                <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Role</label>
-                    <select name="role"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
-                        <option value="admin" {{ old('role', $role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="vendor" {{ old('role', $role) == 'vendor' ? 'selected' : '' }}>Vendor</option>
-                        <option value="buyer" {{ old('role', $role) == 'buyer' ? 'selected' : '' }}>Buyer</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Password</label>
-                    <input type="password" name="password"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        placeholder="Enter password" required>
-                </div>
-=======
                     <div>
                         <label class="block text-dark text-sm font-medium">Full Name</label>
-                        <input type="text" name="name" value="{{ old('name') }}"
+                        <input type="text" name="name" value="{{ old('name') }}
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
->>>>>>> f3569cfc77921242df485ab2742bb9b423f8fd4f
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Email</label>

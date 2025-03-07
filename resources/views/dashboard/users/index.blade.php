@@ -110,36 +110,68 @@
 </div>
 
 <script>
-    function toggleBan(userId) {
-        fetch(`/dashboard/users/${userId}/toggle-ban`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                let button = document.getElementById(`ban-btn-${userId}`);
-                let icon = button.querySelector("i");
-                let text = button.querySelector("span");
+function toggleBan(userId) {
+    fetch(`/dashboard/users/${userId}/toggle-ban`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let button = document.getElementById(`ban-btn-${userId}`);
+            let icon = button.querySelector("i");
+            let text = button.querySelector("span");
 
-                if (data.is_banned) {
-                    button.classList.replace('bg-[#FD2942]', 'bg-[#00df82]');
-                    button.classList.replace('hover:bg-[#e52835]', 'hover:bg-[#00b35f]');
-                    icon.classList.replace('fa-ban', 'fa-check');
-                    text.textContent = "Unban";
-                } else {
-                    button.classList.replace('bg-[#00df82]', 'bg-[#FD2942]');
-                    button.classList.replace('hover:bg-[#00b35f]', 'hover:bg-[#e52835]');
-                    icon.classList.replace('fa-check', 'fa-ban');
-                    text.textContent = "Ban";
-                }
+            let message = "";
+
+            if (data.is_banned) {
+                button.classList.replace('bg-[#FD2942]', 'bg-[#00df82]');
+                button.classList.replace('hover:bg-[#e52835]', 'hover:bg-[#00b35f]');
+                icon.classList.replace('fa-ban', 'fa-check');
+                text.textContent = "Unban";
+                message = "User has been banned successfully.";
+            } else {
+                button.classList.replace('bg-[#00df82]', 'bg-[#FD2942]');
+                button.classList.replace('hover:bg-[#00b35f]', 'hover:bg-[#e52835]');
+                icon.classList.replace('fa-check', 'fa-ban');
+                text.textContent = "Ban";
+                message = "User has been unbanned successfully.";
             }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+
+            // Show success message
+            showSuccessAlert(message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// ✅ Function to Show Success Alert
+function showSuccessAlert(message) {
+    let alertBox = document.createElement('div');
+    alertBox.id = "success-alert";
+    alertBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center p-4 text-green-800 border border-green-300 rounded-lg bg-green-100 dark:bg-green-200 dark:text-green-900 shadow-lg opacity-100 transition-all duration-500 ease-in-out";
+    
+    alertBox.innerHTML = `
+        <svg class="w-5 h-5 text-green-700 dark:text-green-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-3a1 1 0 1 0-2 0v4a1 1 0 0 0 2 0V7Zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/>
+        </svg>
+        <span class="ml-3 text-sm font-medium">${message}</span>
+    `;
+    document.body.appendChild(alertBox);
+
+    // ✅ Hide and remove after 3 seconds
+    setTimeout(() => {
+        alertBox.style.transition = "opacity 0.5s, transform 0.5s ease-in-out";
+        alertBox.style.opacity = "0";
+        alertBox.style.transform = "translate(-50%, -20px)";
+        setTimeout(() => alertBox.remove(), 500);
+    }, 3000);
+}
+
+
 
     document.getElementById("searchBtn").addEventListener("click", function () {
         let query = document.getElementById("search").value.trim();
@@ -181,8 +213,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-
 </script>
-
 @endsection
