@@ -12,15 +12,21 @@ class TicketOfferController extends Controller
     {
         try {
             $vendorId = auth()->id();
-
             $ticketOption = TicketOption::whereHas('event', function ($query) use ($vendorId) {
                 $query->where('user_id', $vendorId);
             })->findOrFail($ticketOptionId);
             $ticketOffers = $ticketOption->ticketOffers()->paginate(10);
 
-            return view('dashboard.ticketOffers.vendor_index', compact('ticketOffers', 'ticketOption'));
+            return response()->json([
+                'success' => true,
+                'ticketOffers' => $ticketOffers,
+                'ticketOption' => $ticketOption,
+            ]);
         } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'You do not have permission to view these ticket offers.');
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to view these ticket offers.',
+            ], 403); 
         }
     }
     // Display all offers for a specific ticket option

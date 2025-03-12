@@ -13,14 +13,14 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('user')->get();
-        return view('admin.orders.index', compact('orders')); // Admin can only view orders
+        return view('admin.orders.index', compact('orders'));
     }
 
     // Admin: View a specific order (web interface)
     public function show($id)
     {
         $order = Order::with('user')->findOrFail($id);
-        return view('admin.orders.show', compact('order')); // Admin can only view a specific order
+        return view('admin.orders.show', compact('order'));
     }
 
     // Admin: View all cancellation requests (web interface)
@@ -101,6 +101,17 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order cancellation rejected'], 200);
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to reject cancellation request', 'details' => $e->getMessage()], 500);
+        }
+    }
+    // User: View all their orders (API)
+    public function userOrders()
+    {
+        try {
+            $orders = Order::where('user_id', auth()->id())->with('tickets')->get();
+
+            return response()->json(['orders' => $orders], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Failed to retrieve orders', 'details' => $e->getMessage()], 500);
         }
     }
 
