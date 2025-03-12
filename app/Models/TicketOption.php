@@ -14,8 +14,11 @@ class TicketOption extends Model
         'type',
         'refund_policy',
         'description',
+        'image',
         'price',
         'quantity',
+        'startDate',
+        'endDate',
         'is_active',
     ];
 

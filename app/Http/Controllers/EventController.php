@@ -11,20 +11,70 @@ use Exception;
 class EventController extends Controller
 {
     // API: Get active events for the buyer
-    public function getActiveEvents(Request $request)
+    public function getEvents(Request $request)
     {
         try {
-            $events = Event::where('status', 'active')->get();
+            $status = $request->query('status', null);
+            $eventsQuery = Event::query();
+            if ($status && in_array($status, ['upcoming', 'active', 'passed', 'delay'])) {
+                // Filter events by status if status is valid
+                $eventsQuery->where('status', $status);
+            }
+            // Fetch the events
+            $events = $eventsQuery->get();
+
             return response()->json([
                 'success' => true,
-                'message' => 'Active events retrieved successfully.',
+                'message' => 'Events retrieved successfully.',
                 'data' => $events,
                 'status' => 200
             ]);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching active events.',
+                'message' => 'Error fetching events.',
+                'error' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
+    }
+
+    // API: Get events filtered by category
+    public function getEventsByCategory(Request $request)
+    {
+        try {
+            $categoryId = $request->query('category_id', null);
+
+            if (!$categoryId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category ID is required.',
+                    'status' => 400
+                ]);
+            }
+
+            // Fetch the events for the specified category
+            $events = Event::where('category_id', $categoryId)->get();
+
+            // Check if events exist for the given category
+            if ($events->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No events found for this category.',
+                    'status' => 404
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Events retrieved successfully.',
+                'data' => $events,
+                'status' => 200
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching events.',
                 'error' => $e->getMessage(),
                 'status' => 500
             ]);
@@ -104,13 +154,19 @@ class EventController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string',
                 'description' => 'required|string',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'startDate' => 'required|date',
                 'endDate' => 'required|date|after:startDate',
                 'category_id' => 'required|exists:categories,id',
+                'status' => 'nullable|string|in:active,upcoming,completed'
             ]);
 
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('events', 'public');
+            }
+
             $event = Event::create($validated);
-            $event->updateStatus();
 
             return redirect()->route('admin.events.index')->with('success', 'Event created successfully');
         } catch (ValidationException $e) {
@@ -119,7 +175,6 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Failed to create event.')->withInput();
         }
     }
-
     // Web: Update event
     public function update($id, Request $request)
     {
@@ -127,14 +182,21 @@ class EventController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string',
                 'description' => 'required|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'startDate' => 'required|date',
                 'endDate' => 'required|date|after:startDate',
                 'category_id' => 'required|exists:categories,id',
+                'status' => 'nullable|string|in:active,upcoming,completed'
             ]);
 
             $event = Event::findOrFail($id);
+
+            // Handle image upload if a new one is provided
+            if ($request->hasFile('image')) {
+                $validated['image'] = $request->file('image')->store('events', 'public');
+            }
+
             $event->update($validated);
-            $event->updateStatus();
 
             return redirect()->route('admin.events.index')->with('success', 'Event updated successfully');
         } catch (ModelNotFoundException $e) {

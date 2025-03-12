@@ -16,9 +16,12 @@ return new class extends Migration {
             $table->string('type');
             $table->text('description');
             $table->text('refund_policy');
+            $table->string('image')->nullable();
             $table->decimal('price', 8, 2);
             $table->integer('quantity');
-            $table->boolean('is_active')->default(true); 
+            $table->dateTime('startDate');
+            $table->dateTime('endDate');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
 
