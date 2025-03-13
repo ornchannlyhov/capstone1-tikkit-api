@@ -9,5 +9,9 @@ class PaymentMethod extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'enable'];
+    protected $fillable = [
+        'name',
+        'code',
+        'is_active',
+    ];
 }

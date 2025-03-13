@@ -1,6 +1,8 @@
 <?php
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentTransactionController;
 use App\Http\Controllers\PurchasedTicketController;
 use App\Http\Controllers\TicketOfferController;
 use App\Http\Controllers\TicketOptionController;
@@ -100,15 +102,23 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
         Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update');
         Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy');
     });
-    // Purchased Ticket Route
-    Route::get('purchased-tickets/{ticketOptionId}', [PurchasedTicketController::class, 'viewPurchasedTicketsForAdmin'])->name('purchasedTickets.index');
 
-    // Order management Route 
-    Route::prefix('admin/orders')->middleware(['auth', 'role:admin'])->name('admin.orders.')->group(function () {
+    // Order management Routes
+    Route::prefix('orders')->middleware(['auth', 'role:admin'])->name('admin.orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('{id}', [OrderController::class, 'show'])->name('show');
         Route::get('cancellation-requests', [OrderController::class, 'viewCancellationRequests'])->name('cancellation-requests');
     });
+
+    // Payment Transaction Routes
+    Route::get('payments', [PaymentTransactionController::class, 'index'])->name('admin.payments.index');
+
+    // Purchased Ticket Route
+    Route::get('purchased-tickets/{ticketOptionId}', [PurchasedTicketController::class, 'viewPurchasedTicketsForAdmin'])->name('purchasedTickets.index');
+
+    // Activities Log Route
+    Route::get('transaction-logs', [ActivityLogController::class, 'index'])->name('admin.transaction_logs');
+    Route::get('activity-logs', [ActivityLogController::class, 'allLogs'])->name('admin.activity_logs');
 
 });
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PurchasedTicketController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\ProfileController;
@@ -23,6 +24,10 @@ Route::get('/', function () {
         : response()->json(['message' => 'Welcome']);
 });
 
+
+// Get all Payment Methods
+Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
+
 // Authentication Routes
 Route::prefix('auth')->group(function () {
 
@@ -35,7 +40,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'userLogin'])->name('login');
 
     // Logout route
-    Route::post('logout', [AuthenticatedSessionController::class, 'apiLogout'])->name('logout');
+    Route::post('logout', [AuthenticatedSessionController::class, 'userLogout'])->name('logout');
 
     // Password reset routes
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
@@ -87,15 +92,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('orders')->middleware('auth:sanctum')->group(function () {
             Route::post('/', [OrderController::class, 'store'])->name('user.order.store');
             Route::post('/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('user.order.cancel');
-            Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.order.all'); // New route
+            Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.order.all'); 
         });
+
+        // Payment process Routes
+        Route::post('/process-payment', [PaymentMethodController::class, 'processPayment']);
 
         // Get all purchased tickets for the buyer
         Route::get('purchased-tickets', [PurchasedTicketController::class, 'viewPurchasedTicketsForBuyer'])->name('buyer.purchased.tickets');
     });
 
     // Vendor Routes
-    Route::prefix('vendor')->group(function () {
+    Route::prefix('vendor')->middleware(['vendor'])->group(function () {
+
+        // Vendor Authentication
+        Route::post('login', [AuthenticatedSessionController::class, 'vendorLogin'])->withoutMiddleware('vendor')->name('vendor.login');
+        Route::post('logout', [AuthenticatedSessionController::class, 'vendorLogout'])->name('vendor.logout');
 
         // Get all events created by the authenticated vendor
         Route::get('events', [EventController::class, 'getVendorEvents'])->name('vendor.events.index');
@@ -103,10 +115,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Validate purchased ticket
         Route::post('validate-ticket', [PurchasedTicketController::class, 'validateQR'])->name('vendor.validate.ticket');
 
-        // View tickert Option of their even 
+        // View ticket options of their event
         Route::get('/events/{eventId}/ticketOptions', [TicketOptionController::class, 'vendorIndex'])->name('vendor.ticketOptions.index');
 
-        // View offer in each tickert option
+        // View offers in each ticket option
         Route::get('/ticketOptions/{ticketOptionId}/ticketOffers', [TicketOfferController::class, 'vendorIndex'])->name('vendor.ticketOffers.index');
 
         // Vendor requests cancellation of an order
@@ -117,9 +129,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Vendor views a specific order
         Route::get('orders/{id}', [OrderController::class, 'vendorShow'])->name('vendor.orders.show');
-
-        // Vendor views cancellation requests
-        Route::get('orders/cancellation-requests', [OrderController::class, 'vendorCancellationRequests'])->name('vendor.orders.cancellation-requests');
 
         // Vendor accepts a cancellation request
         Route::post('orders/{id}/accept-cancel', [OrderController::class, 'acceptCancellationRequest'])->name('vendor.orders.accept-cancel');
