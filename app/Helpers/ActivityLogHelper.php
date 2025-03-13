@@ -21,4 +21,13 @@ class ActivityLogHelper
             'device' => $agent->device() . ' - ' . $agent->platform() . ' - ' . $agent->browser(),
         ]);
     }
+    public static function getAllTransactionLogs()
+    {
+        return ActivityLog::where('activity', 'Completed a payment')->with('user')->orderBy('created_at', 'desc')->get();
+    }
+
+    public static function getAllActivityLogs()
+    {
+        return ActivityLog::with('user')->orderBy('created_at', 'desc')->get();
+    }
 }

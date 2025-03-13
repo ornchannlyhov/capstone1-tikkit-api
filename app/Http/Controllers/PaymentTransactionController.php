@@ -11,6 +11,13 @@ use Carbon\Carbon;
 
 class PaymentTransactionController extends Controller
 {
+    // Admin: View all transactions (web route)
+    public function index()
+    {
+        $transactions = PaymentTransaction::with(['user', 'order'])->get();
+        return view('dashboard.payment.index', compact('transactions'));
+    }
+
     // Store a new payment transaction
     public function store(Request $request)
     {
@@ -23,10 +30,17 @@ class PaymentTransactionController extends Controller
                 'currency' => 'required|string|max:10',
             ]);
 
+            // Retrieve the order and check if the user is authorized and the order is in a pending state.
             $order = Order::where('id', $request->order_id)
                 ->where('user_id', auth()->id())
                 ->where('status', 'pending')
                 ->firstOrFail();
+
+
+            // Check if payment amount matches order total
+            if ($order->total != $request->amount) {
+                return response()->json(['error' => 'Payment amount does not match order total'], 400);
+            }
 
             // Create the payment transaction
             $transaction = PaymentTransaction::create([
@@ -40,9 +54,12 @@ class PaymentTransactionController extends Controller
                 'currency' => $request->currency,
             ]);
 
-            ActivityLogHelper::logActivity(auth()->user(), 'Initiated a payment', "Transaction ID: {$transaction->id}");
+            // Update order status to paid
+            $order->update(['status' => 'paid']);
 
-            return response()->json(['message' => 'Payment transaction recorded', 'transaction' => $transaction], 201);
+            ActivityLogHelper::logActivity(auth()->user(), 'Completed a payment', "Transaction ID: {$transaction->id}");
+
+            return response()->json(['message' => 'Payment transaction recorded successfully', 'transaction' => $transaction], 201);
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to process payment', 'details' => $e->getMessage()], 500);
         }
