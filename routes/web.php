@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentTransactionController;
 use App\Http\Controllers\PurchasedTicketController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TicketOfferController;
 use App\Http\Controllers\TicketOptionController;
 use Illuminate\Support\Facades\Route;
@@ -119,6 +120,9 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
     // Activities Log Route
     Route::get('transaction-logs', [ActivityLogController::class, 'index'])->name('admin.transaction_logs');
     Route::get('activity-logs', [ActivityLogController::class, 'allLogs'])->name('admin.activity_logs');
+
+    // Reports Routes
+    Route::get('reports/event-stats', [ReportController::class, 'adminEventStats'])->name('admin.reports.event_stats');
 
 });
 

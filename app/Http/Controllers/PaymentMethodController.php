@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PaymentMethod;
+use App\Models\PurchasedTicket;
+use App\Models\TicketOption;
 use Stripe\Stripe;
 use Stripe\Charge;
 use Exception;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 
 class PaymentMethodController extends Controller
 {
@@ -27,6 +32,7 @@ class PaymentMethodController extends Controller
             'amount' => 'required|numeric|min:0.5',
             'currency' => 'required|string|max:3',
             'order_id' => 'required|exists:orders,id',
+            'ticket_option_id' => 'required|exists:ticket_options,id',
             'stripeToken' => 'sometimes|required_if:payment_method,visa',
         ]);
 
@@ -63,7 +69,8 @@ class PaymentMethodController extends Controller
             ]);
 
             if ($charge->status == 'succeeded') {
-                return response()->json(['message' => 'Visa payment successful', 'transaction_id' => $charge->id], 200);
+                // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
+                return $this->createPurchasedTicket($request->ticket_option_id);
             } else {
                 return response()->json(['error' => 'Visa payment failed'], 400);
             }
@@ -97,8 +104,8 @@ class PaymentMethodController extends Controller
             'amount' => $request->amount,
             'payment_option' => $request->payment_option,
             'hash' => $request->hash,
-            'type' => 'purchase', // Default value
-            'currency' => $request->currency, // Use from config or request
+            'type' => 'purchase',
+            'currency' => $request->currency,
 
             //Optinal if required
             'firstname' => $request->firstname ?? null,
@@ -127,10 +134,8 @@ class PaymentMethodController extends Controller
 
             if (isset($responseBody['status']) && $responseBody['status']['code'] === '00') {
                 // Payment Successful
-                return response()->json([
-                    'message' => 'ABA payment initiated successfully',
-                    'data' => $responseBody
-                ], 200);
+                // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
+                return $this->createPurchasedTicket($request->ticket_option_id);
             } else {
                 Log::error("PayWay API error: " . json_encode($responseBody));
                 return response()->json(['error' => 'ABA payment failed: ' . ($responseBody['status']['message'] ?? 'Unknown error')], 400);
@@ -159,7 +164,51 @@ class PaymentMethodController extends Controller
     // Cash on Delivery
     private function processCashOnDelivery(Request $request)
     {
-        return response()->json(['message' => 'Cash on delivery selected. Order processing.'], 200);
+        //update order status to pending
+        // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
+        return $this->createPurchasedTicket($request->ticket_option_id);
+    }
+
+    // Helper function to create a purchased ticket
+    private function createPurchasedTicket($ticketOptionId)
+    {
+        $ticketOption = TicketOption::findOrFail($ticketOptionId);
+        if ($ticketOption->quantity <= 0) {
+            return response()->json(['error' => 'Sold out'], 400);
+        }
+
+        // Wrap the operation in a transaction for atomicity
+        DB::beginTransaction();
+        try {
+            $ticketOption->decrement('quantity', 1);  // Reduce available quantity
+
+            $uniqueHash = Str::uuid()->toString();
+
+            $purchasedTicket = PurchasedTicket::create([
+                'ticket_id' => $ticketOption->id,
+                'user_id' => auth()->id(),
+                'qr_code' => $uniqueHash,
+                'status' => 'valid',
+            ]);
+
+            // Generate QR code image (base64 encoded PNG)
+            $qrCode = base64_encode(QrCode::format('png')->size(300)->generate(json_encode([
+                'ticket_id' => $purchasedTicket->id,
+                'hash' => $uniqueHash,
+            ])));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Payment successful. Ticket created.',
+                'ticket_id' => $purchasedTicket->id,
+                'qr_code' => $qrCode,
+            ], 201);
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error("Error creating purchased ticket: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return response()->json(['error' => 'Failed to create purchased ticket'], 500);
+        }
     }
 
     // Function to generate ABA Hash (as per PayWay documentation)

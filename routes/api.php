@@ -11,6 +11,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PurchasedTicketController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TicketOfferController;
@@ -135,5 +136,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Vendor rejects a cancellation request
         Route::post('orders/{id}/reject-cancel', [OrderController::class, 'rejectCancellationRequest'])->name('vendor.orders.reject-cancel');
+
+        // Sale Reports
+
+        Route::get('ticket-sales', [ReportController::class, 'vendorTicketSalesReport']);
     });
 });
