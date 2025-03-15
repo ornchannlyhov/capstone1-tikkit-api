@@ -9,6 +9,26 @@ use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
+
+    // get all category (API)
+    public function apiIndex()
+    {
+        try {
+            $categories = Category::all();
+            return response()->json([
+                'success' => true,
+                'data' => $categories
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch categories.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // get all category (web)
     public function index()
     {
         $categories = Category::all();

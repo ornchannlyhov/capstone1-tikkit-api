@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentMethodController;
@@ -80,6 +81,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             // Get all tickets (TicketOptions) for a specific event
             Route::get('{eventId}/tickets', [TicketOptionController::class, 'getEventTickets'])->name('buyer.event.tickets');
         });
+        // Category route 
+        Route::get('/categories', [CategoryController::class, 'apiIndex'])->name('buyer.categories');
 
         // Cart handle
         Route::prefix('cart')->middleware('auth:sanctum')->group(function () {
@@ -93,7 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('orders')->middleware('auth:sanctum')->group(function () {
             Route::post('/', [OrderController::class, 'store'])->name('user.order.store');
             Route::post('/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('user.order.cancel');
-            Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.order.all'); 
+            Route::get('/my-orders', [OrderController::class, 'userOrders'])->name('user.order.all');
         });
 
         // Payment process Routes
