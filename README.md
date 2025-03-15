@@ -115,5 +115,3 @@ We’re a collaborative team of developers working together to deliver this proj
 
 For inquiries or support, contact us at [[ornchannlyhov@email.com](mailto\:ornchannlyhov@email.com)].
 
-md file
-
