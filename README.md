@@ -105,11 +105,11 @@ We follow best practices in Laravel development to ensure maintainability and sc
 We’re a collaborative team of developers working together to deliver this project. Feel free to reach out to any of us for assistance or queries!
 
 - **[Noun Sopheap]** - Role: [Project Manager]
-- **[Mengthong Ly]** - Role: [UI/UX Designer && Frontend Developer]
-- **[Tiveon Kong]** - Role: [Frontend Developer]
 - **[Sovichet Thy]** - Role: [UI/UX Designer]
+- **[Mengthong Ly]** - Role: [UI/UX Designer && Frontend Developer - APP]
+- **[Tiveon Kong]** - Role: [Frontend Developer - WEB]
+- **[Pay Panha]** - Role: [Frontend Developer - WEB]
 - **[Ornchann Lyhov]** - Role: [Backend Developer]
-- **[Pay Panha]** - Role: [Backend Developer]
 
 ## 💎 Contact
 
