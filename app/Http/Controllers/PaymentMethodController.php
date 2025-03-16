@@ -44,8 +44,6 @@ class PaymentMethodController extends Controller
                     return $this->processVisaPayment($request);
                 case 'aba':
                     return $this->processAbaPayment($request);
-                case 'cod':
-                    return $this->processCashOnDelivery($request);
                 default:
                     return response()->json(['error' => 'Invalid payment method'], 400);
             }
@@ -159,14 +157,6 @@ class PaymentMethodController extends Controller
             }
         }
         return $multipart;
-    }
-
-    // Cash on Delivery
-    private function processCashOnDelivery(Request $request)
-    {
-        //update order status to pending
-        // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
-        return $this->createPurchasedTicket($request->ticket_option_id);
     }
 
     // Helper function to create a purchased ticket
