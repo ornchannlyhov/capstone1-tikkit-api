@@ -45,7 +45,7 @@ class PaymentTransactionController extends Controller
             // Create the payment transaction
             $transaction = PaymentTransaction::create([
                 'order_id' => $order->id,
-                'user_id' => auth()->id(),
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
                 'method_id' => $request->method_id,
                 'status' => 'processing',
                 'amount' => $request->amount,
@@ -54,10 +54,7 @@ class PaymentTransactionController extends Controller
                 'currency' => $request->currency,
             ]);
 
-            // Update order status to paid
-            $order->update(['status' => 'paid']);
-
-            ActivityLogHelper::logActivity(auth()->user(), 'Completed a payment', "Transaction ID: {$transaction->id}");
+            ActivityLogHelper::logActivity(auth()->user(), 'initiated_payment', "Transaction ID: {$transaction->id}");
 
             return response()->json(['message' => 'Payment transaction recorded successfully', 'transaction' => $transaction], 201);
         } catch (Exception $e) {

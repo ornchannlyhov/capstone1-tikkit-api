@@ -89,7 +89,7 @@ class EventController extends Controller
     public function getVendorEvents(Request $request)
     {
         try {
-            $vendor = auth()->user();
+            $vendor = $request->user();
 
             if ($vendor->role !== 'vendor') {
                 return response()->json([
