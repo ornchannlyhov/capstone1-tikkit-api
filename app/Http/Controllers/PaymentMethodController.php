@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TicketOffer;
 use Illuminate\Http\Request;
 use App\Models\PaymentMethod;
 use App\Models\PurchasedTicket;
 use App\Models\TicketOption;
+use App\Models\Offer;  // Add Offer model
 use Stripe\Stripe;
 use Stripe\Charge;
 use Exception;
@@ -20,8 +22,13 @@ class PaymentMethodController extends Controller
     // Display available payment methods
     public function index()
     {
-        $paymentMethods = PaymentMethod::where('is_active', true)->get();
-        return response()->json(['payment_methods' => $paymentMethods], 200);
+        try {
+            $paymentMethods = PaymentMethod::where('is_active', true)->get();
+            return response()->json(['payment_methods' => $paymentMethods], 200);
+        } catch (Exception $e) {
+            Log::error("Error fetching payment methods: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch payment methods.'], 500);
+        }
     }
 
     // Process payment
@@ -33,34 +40,49 @@ class PaymentMethodController extends Controller
             'currency' => 'required|string|max:3',
             'order_id' => 'required|exists:orders,id',
             'ticket_option_id' => 'required|exists:ticket_options,id',
+            'offer_id' => 'nullable|exists:offers,id',
             'stripeToken' => 'sometimes|required_if:payment_method,visa',
         ]);
 
         $paymentMethod = PaymentMethod::where('code', $request->payment_method)->first();
+        $offer = null;
 
         try {
+            if ($request->has('offer_id')) {
+                $offer = TicketOffer::active()->find($request->offer_id);
+                if (!$offer) {
+                    return response()->json(['error' => 'Invalid or expired offer'], 400);
+                }
+                if ($offer->usage_limit <= 0) {
+                    return response()->json(['error' => 'Offer usage limit reached'], 400);
+                }
+            }
+
             switch ($paymentMethod->code) {
                 case 'visa':
-                    return $this->processVisaPayment($request);
+                    return $this->processVisaPayment($request, $offer);  
                 case 'aba':
-                    return $this->processAbaPayment($request);
+                    return $this->processAbaPayment($request, $offer);  
                 default:
                     return response()->json(['error' => 'Invalid payment method'], 400);
             }
         } catch (Exception $e) {
-            Log::error("Payment processing error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error("Error processing payment: " . $e->getMessage());
             return response()->json(['error' => 'Payment processing failed: ' . $e->getMessage()], 500);
         }
     }
 
     // Visa Payment (Using Stripe)
-    private function processVisaPayment(Request $request)
+    private function processVisaPayment(Request $request, $offer)
     {
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
 
+            // Apply offer discount if available
+            $amount = $offer ? $this->applyOfferDiscount($request->amount, $offer) : $request->amount;
+
             $charge = Charge::create([
-                'amount' => $request->amount * 100, // Stripe handles amounts in cents
+                'amount' => $amount * 100, 
                 'currency' => $request->currency,
                 'source' => $request->stripeToken,
                 'description' => 'Payment for order #' . $request->order_id,
@@ -68,12 +90,13 @@ class PaymentMethodController extends Controller
 
             if ($charge->status == 'succeeded') {
                 // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
-                return $this->createPurchasedTicket($request->ticket_option_id);
+                return $this->createPurchasedTicket($request->ticket_option_id, $offer);
             } else {
                 return response()->json(['error' => 'Visa payment failed'], 400);
             }
 
         } catch (\Stripe\Exception\CardException $e) {
+            Log::error("Stripe error: " . $e->getMessage());
             return response()->json(['error' => 'Card error: ' . $e->getMessage()], 400);
         } catch (Exception $e) {
             Log::error("Stripe error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -82,41 +105,30 @@ class PaymentMethodController extends Controller
     }
 
     // ABA Payment (PayWay)
-    private function processAbaPayment(Request $request)
+    private function processAbaPayment(Request $request, $offer)
     {
         $request->validate([
             'req_time' => 'required|date_format:YmdHis',
             'tran_id' => 'required|string|max:20',
             'payment_option' => 'required|string|max:20',
             'hash' => 'required|string',
-            //'items' => 'nullable|string|max:500', // if you using items, require it
         ]);
 
         $apiKey = config('services.payway.api_key');
         $apiEndpoint = config('services.payway.api_endpoint');
 
+        // Apply offer discount if available
+        $amount = $offer ? $this->applyOfferDiscount($request->amount, $offer) : $request->amount;
+
         $params = [
             'req_time' => $request->req_time,
             'merchant_id' => config('services.payway.merchant_id'),
             'tran_id' => $request->tran_id,
-            'amount' => $request->amount,
+            'amount' => $amount,
             'payment_option' => $request->payment_option,
             'hash' => $request->hash,
             'type' => 'purchase',
             'currency' => $request->currency,
-
-            //Optinal if required
-            'firstname' => $request->firstname ?? null,
-            'lastname' => $request->lastname ?? null,
-            'email' => $request->email ?? null,
-            'phone' => $request->phone ?? null,
-            'items' => $request->items ?? null,
-            'return_url' => $request->return_url ?? null,
-            'cancel_url' => $request->cancel_url ?? null,
-            'continue_success_url' => $request->continue_success_url ?? null,
-            'return_deeplink' => $request->return_deeplink ?? null,
-            'custom_fields' => $request->custom_fields ?? null,
-            'return_param' => $request->return_param ?? null,
         ];
 
         try {
@@ -133,7 +145,7 @@ class PaymentMethodController extends Controller
             if (isset($responseBody['status']) && $responseBody['status']['code'] === '00') {
                 // Payment Successful
                 // *** IMPORTANT: Create Purchased Ticket AFTER successful payment ***
-                return $this->createPurchasedTicket($request->ticket_option_id);
+                return $this->createPurchasedTicket($request->ticket_option_id, $offer);
             } else {
                 Log::error("PayWay API error: " . json_encode($responseBody));
                 return response()->json(['error' => 'ABA payment failed: ' . ($responseBody['status']['message'] ?? 'Unknown error')], 400);
@@ -145,38 +157,46 @@ class PaymentMethodController extends Controller
         }
     }
 
-    private function formatMultipartData(array $params): array
+    private function applyOfferDiscount($amount, $offer)
     {
-        $multipart = [];
-        foreach ($params as $key => $value) {
-            if ($value !== null) {
-                $multipart[] = [
-                    'name' => $key,
-                    'contents' => $value,
-                ];
+        try {
+            // Example: Apply a flat discount or percentage discount based on the offer
+            if ($offer->type === 'percentage') {
+                return $amount - ($amount * ($offer->discount / 100));
+            } elseif ($offer->type === 'flat') {
+                return $amount - $offer->discount;
             }
+            return $amount;
+        } catch (Exception $e) {
+            Log::error("Error applying offer discount: " . $e->getMessage());
+            throw new Exception("Failed to apply offer discount");
         }
-        return $multipart;
     }
 
     // Helper function to create a purchased ticket
-    private function createPurchasedTicket($ticketOptionId)
+    private function createPurchasedTicket($ticketOptionId, $offer)
     {
-        $ticketOption = TicketOption::findOrFail($ticketOptionId);
-        if ($ticketOption->quantity <= 0) {
-            return response()->json(['error' => 'Sold out'], 400);
-        }
-
-        // Wrap the operation in a transaction for atomicity
         DB::beginTransaction();
         try {
-            $ticketOption->decrement('quantity', 1);  // Reduce available quantity
+            $ticketOption = TicketOption::findOrFail($ticketOptionId);
+            if ($ticketOption->quantity <= 0) {
+                throw new Exception('Sold out');
+            }
+
+            // Decrease available quantity of the ticket option
+            $ticketOption->decrement('quantity', 1);
+
+            if ($offer && $offer->usage_limit !== null) {
+                // Decrease the offer's usage limit
+                $offer->decrement('usage_limit', 1);
+            }
 
             $uniqueHash = Str::uuid()->toString();
 
             $purchasedTicket = PurchasedTicket::create([
                 'ticket_id' => $ticketOption->id,
                 'user_id' => auth()->id(),
+                'offer_id' => $offer ? $offer->id : null, 
                 'qr_code' => $uniqueHash,
                 'status' => 'valid',
             ]);
@@ -197,25 +217,20 @@ class PaymentMethodController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             Log::error("Error creating purchased ticket: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return response()->json(['error' => 'Failed to create purchased ticket'], 500);
+            return response()->json(['error' => 'Failed to create purchased ticket: ' . $e->getMessage()], 500);
         }
     }
 
-    // Function to generate ABA Hash (as per PayWay documentation)
-    public static function generateAbaHash(array $params, string $publicKey): string
+    // Format the multipart data for PayWay API request
+    private function formatMultipartData(array $params): array
     {
-
-        $stringToHash =
-            $params['req_time'] .
-            config('services.payway.merchant_id') .
-            $params['tran_id'] .
-            $params['amount'];
-
-        if (isset($params['items'])) {
-            $stringToHash .= $params['items'];
+        $multipart = [];
+        foreach ($params as $key => $value) {
+            $multipart[] = [
+                'name' => $key,
+                'contents' => $value,
+            ];
         }
-
-        $hash = hash_hmac('sha512', $stringToHash, $publicKey, true);
-        return base64_encode($hash);
+        return $multipart;
     }
 }

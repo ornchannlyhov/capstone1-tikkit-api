@@ -141,7 +141,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('orders/{id}/reject-cancel', [OrderController::class, 'rejectCancellationRequest'])->name('vendor.orders.reject-cancel');
 
         // Sale Reports
-
         Route::get('ticket-sales', [ReportController::class, 'vendorTicketSalesReport']);
     });
 });

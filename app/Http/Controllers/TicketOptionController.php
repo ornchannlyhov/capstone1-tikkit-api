@@ -14,11 +14,31 @@ class TicketOptionController extends Controller
     {
         try {
             $vendorId = auth()->id();
-            $event = Event::where('id', $eventId)->where('user_id', $vendorId)->firstOrFail();
-            $ticketOptions = TicketOption::where('event_id', $event->id)->get();
-            return view('dashboard.ticketOptions.vendor_index', compact('ticketOptions', 'event'));
+
+            // Ensure the vendor owns this event
+            $event = Event::where('id', $eventId)
+                ->where('user_id', $vendorId)
+                ->firstOrFail();
+
+            // Fetch ticket options along with their offers (merch items)
+            $ticketOptions = TicketOption::where('event_id', $event->id)
+                ->with('ticketOffers')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket options retrieved successfully.',
+                'data' => [
+                    'event' => $event,
+                    'ticketOptions' => $ticketOptions
+                ]
+            ], 200);
         } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'You do not have permission to view these ticket options.');
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to view these ticket options.',
+                'error' => $e->getMessage()
+            ], 403);
         }
     }
     // Get all tickets (TicketOptions) for a specific event
@@ -26,7 +46,9 @@ class TicketOptionController extends Controller
     {
         try {
             $event = Event::findOrFail($eventId);
-            $ticketOptions = $event->ticketOptions;
+
+            $ticketOptions = $event->ticketOptions()->with('ticketOffers')->get();
+
             return response()->json([
                 'success' => true,
                 'data' => $ticketOptions

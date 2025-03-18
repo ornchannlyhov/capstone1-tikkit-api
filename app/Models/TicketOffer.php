@@ -10,14 +10,18 @@ class TicketOffer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ticket_id', 
-        'name', 
-        'details', 
-        'quantity', 
+        'ticket_id',
+        'name',
+        'details',
+        'quantity',
     ];
 
     public function ticketOption()
     {
         return $this->belongsTo(TicketOption::class, 'ticket_id');
+    }
+    public function purchasedTickets()
+    {
+        return $this->hasMany(PurchasedTicket::class, 'offer_id');
     }
 }

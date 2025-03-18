@@ -10,17 +10,23 @@ use Exception;
 
 class EventController extends Controller
 {
-    // API: Get active events for the buyer
+    // API: Get events for the buyer
     public function getEvents(Request $request)
     {
         try {
             $status = $request->query('status', null);
-            $eventsQuery = Event::query();
+
+            $eventsQuery = Event::with([
+                'user' => function ($query) {
+                    $query->select('id', 'name', 'email', 'phone_number')
+                        ->where('role', 'vendor'); 
+                }
+            ]);
+
             if ($status && in_array($status, ['upcoming', 'active', 'passed', 'delay'])) {
-                // Filter events by status if status is valid
                 $eventsQuery->where('status', $status);
             }
-            // Fetch the events
+
             $events = $eventsQuery->get();
 
             return response()->json([
@@ -38,7 +44,6 @@ class EventController extends Controller
             ]);
         }
     }
-
     // API: Get events filtered by category
     public function getEventsByCategory(Request $request)
     {

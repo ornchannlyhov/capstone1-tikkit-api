@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PurchasedTicket;
+use App\Models\TicketOffer;
 use App\Models\TicketOption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,28 +18,46 @@ class PurchasedTicketController extends Controller
     {
         $request->validate([
             'ticket_option_id' => 'required|exists:ticket_options,id',
+            'offer_id' => 'nullable|exists:offers,id',
         ]);
 
         $ticketOption = TicketOption::findOrFail($request->ticket_option_id);
+
         if ($ticketOption->available_quantity <= 0) {
             return response()->json(['error' => 'Sold out'], 400);
         }
 
-        // Wrap the operation in a transaction for atomicity
+        $offer = null;
+        if ($request->has('offer_id')) {
+            $offer = TicketOffer::active()->find($request->offer_id);
+
+            if (!$offer) {
+                return response()->json(['error' => 'Invalid or expired offer'], 400);
+            }
+
+            if ($offer->usage_limit !== null && $offer->usage_limit <= 0) {
+                return response()->json(['error' => 'Offer usage limit reached'], 400);
+            }
+        }
+
         DB::beginTransaction();
         try {
-            $ticketOption->decrement('available_quantity', 1); 
+            $ticketOption->decrement('available_quantity', 1);
+
+            if ($offer && $offer->usage_limit !== null) {
+                $offer->decrement('usage_limit', 1);
+            }
 
             $uniqueHash = Str::uuid()->toString();
 
             $purchasedTicket = PurchasedTicket::create([
                 'ticket_id' => $ticketOption->id,
                 'user_id' => auth()->id(),
+                'offer_id' => $offer ? $offer->id : null,
                 'qr_code' => $uniqueHash,
                 'status' => 'valid',
             ]);
 
-            // Generate QR code image (base64 encoded PNG)
             $qrCode = base64_encode(QrCode::format('png')->size(300)->generate(json_encode([
                 'ticket_id' => $purchasedTicket->id,
                 'hash' => $uniqueHash,
@@ -49,11 +68,11 @@ class PurchasedTicketController extends Controller
             return response()->json([
                 'ticket_id' => $purchasedTicket->id,
                 'qr_code' => $qrCode,
-            ], 201); 
+            ], 201);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error("Error creating purchased ticket: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return response()->json(['error' => 'Failed to create purchased ticket'], 500);
+            Log::error("Error purchasing ticket: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to process purchase'], 500);
         }
     }
 
@@ -61,7 +80,7 @@ class PurchasedTicketController extends Controller
     public function viewPurchasedTicketsForBuyer(Request $request)
     {
         $purchasedTickets = PurchasedTicket::where('user_id', auth()->id())
-            ->with('ticketOption.event') 
+            ->with('ticketOption.event')
             ->get();
 
         return response()->json([
