@@ -187,8 +187,9 @@ class OrderController extends Controller
 
                 $order->carts()->attach($request->cart_ids);
 
-                // Delete the carts after attaching them to the order
-                \App\Models\Cart::destroy($request->cart_ids);
+                // Update the status of the carts to "completed" instead of deleting them
+                \App\Models\Cart::whereIn('id', $request->cart_ids)
+                    ->update(['status' => \App\Models\Cart::STATUS_COMPLETED]);
 
                 DB::commit();
 

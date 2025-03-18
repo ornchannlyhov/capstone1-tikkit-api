@@ -88,7 +88,7 @@ class PurchasedTicketController extends Controller
             $response = $purchasedTickets->map(function ($ticket) {
                 return [
                     'ticket_id' => $ticket->id,
-                    'ticket_name' => $ticket->ticketOption->name,
+                    'ticket_name' => $ticket->ticketOption->type,
                     'ticket_price' => $ticket->ticketOption->price,
                     'event' => [
                         'event_name' => $ticket->ticketOption->event->name,

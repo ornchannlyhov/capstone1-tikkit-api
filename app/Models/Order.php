@@ -18,7 +18,8 @@ class Order extends Model
 
     public function carts()
     {
-        return $this->belongsToMany(Cart::class, 'order_cart');
+        return $this->belongsToMany(Cart::class, 'order_cart')
+                    ->withTimestamps();
     }
 
     public function transaction()

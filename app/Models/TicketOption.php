@@ -28,9 +28,9 @@ class TicketOption extends Model
     }
 
     public function ticketOffers()
-    {
-        return $this->hasMany(TicketOffer::class);
-    }
+{
+    return $this->hasMany(TicketOffer::class, 'ticket_id'); // Fixed to use ticket_id
+}
 
     public function purchasedTickets()
     {
