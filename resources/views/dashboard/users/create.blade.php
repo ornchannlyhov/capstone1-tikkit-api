@@ -1,6 +1,6 @@
 
 
-<!-- ✅ Flowbite Modal -->
+<!--  Flowbite Modal -->
 <div id="userModal" tabindex="-1" aria-hidden="true"
     class="fixed inset-0 z-50 hidden overflow-y-auto bg-dark bg-opacity-50 flex items-center justify-center">
     <div class="relative w-full max-w-lg">
@@ -31,7 +31,7 @@
                     </div>
                 @endif
 
-                <!-- ✅ User Form -->
+                <!-- User Form -->
                 <form action="{{ $action }}" method="POST" class="space-y-4">
                     @csrf
 
