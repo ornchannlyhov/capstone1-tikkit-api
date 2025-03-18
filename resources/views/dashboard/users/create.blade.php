@@ -38,8 +38,8 @@
 
                     <div>
                         <label class="block text-dark text-sm font-medium">Full Name</label>
-                        <input type="text" name="name" value="{{ old('name') }}
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
+                        <input type="text" name="name" value="{{ old('name') }}"
+                            class="w-full px-3 py-2  border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition duration-200" required>
                     </div>
 
                     <div>

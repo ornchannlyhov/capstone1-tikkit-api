@@ -121,7 +121,7 @@ class UserController extends Controller
             ]);
 
             // Log activity
-            ActivityLogHelper::logActivity(auth()->user(), "update_user", "Updated user {$user->name} ({$user->id})");
+            ActivityLogHelper::logActivity(\Illuminate\Support\Facades\Auth::user(), "update_user", "Updated user {$user->name} ({$user->id})");
 
             return redirect()->route('users.index')->with('success', 'User updated successfully');
         } catch (Exception $e) {
@@ -134,7 +134,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            ActivityLogHelper::logActivity(auth()->user(), "delete_user", "Deleted user {$user->name} ({$user->id})");
+            ActivityLogHelper::logActivity(\Illuminate\Support\Facades\Auth::user(), "delete_user", "Deleted user {$user->name} ({$user->id})");
 
             $user->delete();
 
@@ -226,7 +226,7 @@ class UserController extends Controller
             ]);
 
             // Log activity
-            ActivityLogHelper::logActivity(auth()->user(), "update_vendor", "Updated vendor {$user->name} ({$user->id})");
+            ActivityLogHelper::logActivity(\Illuminate\Support\Facades\Auth::user(), "update_vendor", "Updated vendor {$user->name} ({$user->id})");
 
             return redirect()->route('users.vendorIndex')->with('success', 'Vendor updated successfully');
         } catch (Exception $e) {
@@ -238,7 +238,7 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            ActivityLogHelper::logActivity(auth()->user(), "delete_vendor", "Deleted vendor {$user->name} ({$user->id})");
+            ActivityLogHelper::logActivity(\Illuminate\Support\Facades\Auth::user(), "delete_vendor", "Deleted vendor {$user->name} ({$user->id})");
 
             $user->delete();
 

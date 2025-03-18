@@ -15,19 +15,21 @@ class AddressController extends Controller
     public function index()
     {
         try {
-            $addresses = Address::all();
-            return view('dashboard.addresses.index', compact('addresses'));
+            $addresses = Address::all(); // Fetch addresses
+            $events = Event::all(); // Fetch events for the modal
+            return view('dashboard.addresses.index', compact('addresses', 'events'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Error fetching addresses.');
         }
     }
+    
 
     // Show the form for creating a new address.
     public function create()
     {
         try {
             $events = Event::all();
-            return view('dashboard.addresses.create', compact('events'));
+            return view('dashboard.Addresses.create', compact('events'));
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Error loading create address form.');
         }
@@ -38,16 +40,16 @@ class AddressController extends Controller
     {
         try {
             $validated = $request->validate([
-                'event_id' => 'required|exists:events,id',
+                'event_id' => 'nullable|exists:events,id',
                 'street' => 'required|string|max:255',
                 'city' => 'required|string|max:255',
                 'country' => 'required|string|max:255',
                 'venue_name' => 'nullable|string|max:255',
                 'extra_info' => 'nullable|string',
             ]);
-
+    
             Address::create($validated);
-
+    
             return redirect()->route('addresses.index')->with('success', 'Address created successfully.');
         } catch (ValidationException $e) {
             return redirect()->back()->withErrors($e->errors())->withInput();
@@ -55,6 +57,8 @@ class AddressController extends Controller
             return redirect()->back()->with('error', 'Failed to create address.')->withInput();
         }
     }
+    
+    
 
     // Display the specified address.
     public function show($id)

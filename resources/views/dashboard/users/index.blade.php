@@ -148,7 +148,7 @@ function toggleBan(userId) {
     .catch(error => console.error('Error:', error));
 }
 
-// ✅ Function to Show Success Alert
+//  Function to Show Success Alert
 function showSuccessAlert(message) {
     let alertBox = document.createElement('div');
     alertBox.id = "success-alert";
@@ -162,7 +162,7 @@ function showSuccessAlert(message) {
     `;
     document.body.appendChild(alertBox);
 
-    // ✅ Hide and remove after 3 seconds
+    // Hide and remove after 3 seconds
     setTimeout(() => {
         alertBox.style.transition = "opacity 0.5s, transform 0.5s ease-in-out";
         alertBox.style.opacity = "0";
@@ -184,7 +184,7 @@ function showSuccessAlert(message) {
 
     
 document.addEventListener('DOMContentLoaded', function () {
-    // ✅ Open Edit Modal and Populate Data
+    // Open Edit Modal and Populate Data
     window.openEditUserModal = function (id, name, email, phone, role) {
         document.getElementById('editUserModal').classList.remove('hidden');
 
@@ -199,14 +199,14 @@ document.addEventListener('DOMContentLoaded', function () {
         form.action = `/dashboard/users/${id}`; // Update this to match your route
     };
 
-    // ✅ Close Modal on Button Click
+    //  Close Modal on Button Click
     document.querySelectorAll('[data-modal-hide="editUserModal"]').forEach(button => {
         button.addEventListener('click', function () {
             document.getElementById('editUserModal').classList.add('hidden');
         });
     });
 
-    // ✅ Close Modal When Clicking Outside
+    //  Close Modal When Clicking Outside
     document.getElementById('editUserModal').addEventListener('click', function (event) {
         if (event.target === this) {
             this.classList.add('hidden');

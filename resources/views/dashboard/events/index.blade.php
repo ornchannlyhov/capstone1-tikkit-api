@@ -101,5 +101,37 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("JavaScript Loaded ✅");
+
+        // ✅ Handle Edit Button Click
+        document.querySelectorAll('.edit-address-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                let address = JSON.parse(this.getAttribute('data-address'));
+                console.log("Editing Address:", address);
+
+                // Fill modal inputs
+                document.getElementById('editAddressId').value = address.id;
+                document.getElementById('editStreet').value = address.street;
+                document.getElementById('editCity').value = address.city;
+                document.getElementById('editCountry').value = address.country;
+
+                // Set form action dynamically
+                let form = document.getElementById('editAddressForm');
+                form.action = `/addresses/${address.id}`;
+
+                // Show modal
+                document.getElementById('editAddressModal').classList.remove('hidden');
+            });
+        });
+
+        // ✅ Close Edit Modal
+        document.getElementById('closeEditModalBtn').addEventListener('click', function () {
+            document.getElementById('editAddressModal').classList.add('hidden');
+        });
+    });
+</script>
+
 </script>
 @endsection
