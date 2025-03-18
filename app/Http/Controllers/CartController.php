@@ -23,7 +23,7 @@ class CartController extends Controller
             $ticketOption = TicketOption::findOrFail($request->ticket_id);
 
             // Check if there's enough available quantity
-            if ($ticketOption->available_quantity < $request->quantity) {
+            if ($ticketOption->quantity < $request->quantity) {
                 return response()->json(['error' => 'Not enough tickets available.'], 400);
             }
 
@@ -42,7 +42,7 @@ class CartController extends Controller
                     'user_id' => $request->user()->id,
                     'ticket_id' => $ticketOption->id,
                     'quantity' => $request->quantity,
-                    'event_id' => $ticketOption->event_id, //Add this incase it needed
+                    'event_id' => $ticketOption->event_id,
                 ]);
             }
 
@@ -114,7 +114,7 @@ class CartController extends Controller
             }
             $ticketOption = TicketOption::findOrFail($cartItem->ticket_id);
             // Check if there's enough available quantity
-            if ($ticketOption->available_quantity < $request->quantity) {
+            if ($ticketOption->quantity < $request->quantity) {
                 return response()->json(['error' => 'Not enough tickets available.'], 400);
             }
             $cartItem->quantity = $request->quantity;
