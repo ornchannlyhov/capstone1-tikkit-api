@@ -15,13 +15,14 @@ return new class extends Migration {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('ticket_id');
             $table->decimal('quantity', 10, 2);
+            $table->unsignedBigInteger('event_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('ticket_id')->references('id')->on('ticket_options')->onDelete('cascade');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });
-
     }
 
     /**

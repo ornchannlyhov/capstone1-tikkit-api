@@ -14,8 +14,11 @@ class TicketOption extends Model
         'type',
         'refund_policy',
         'description',
+        'image',
         'price',
         'quantity',
+        'startDate',
+        'endDate',
         'is_active',
     ];
 
@@ -32,14 +35,5 @@ class TicketOption extends Model
     public function purchasedTickets()
     {
         return $this->hasMany(PurchasedTicket::class);
-    }
-
-    public function reduceQuantity($amount = 1)
-    {
-        if ($this->quantity >= $amount) {
-            $this->decrement('quantity', $amount);
-        } else {
-            throw new \Exception("Not enough tickets available");
-        }
     }
 }

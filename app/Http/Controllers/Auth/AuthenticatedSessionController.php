@@ -71,7 +71,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     // Handle API user logout (Token-based).
-    public function apiLogout(Request $request): JsonResponse
+    public function userLogout(Request $request): JsonResponse
     {
         try {
             $user = Auth::guard('sanctum')->user();
@@ -110,5 +110,74 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('status', 'Successfully logged out.');
+    }
+
+    // vendor login
+    public function vendorLogin(LoginRequest $request): JsonResponse
+    {
+        try {
+            $request->authenticate();
+            $user = Auth::user();
+
+            if ($user->role !== 'vendor') {
+                return response()->json([
+                    'message' => 'Access denied. Only vendors can log in.',
+                ], 403);
+            }
+
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            ActivityLogHelper::logActivity($user, 'LogIn', 'Vendor logged in');
+
+            return response()->json([
+                'message' => 'Login successful',
+                'user' => $user,
+                'token' => $token
+            ], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Login failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Handle API vendor logout (Token-based).
+    public function vendorLogout(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::guard('sanctum')->user();
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'No authenticated vendor found',
+                ], 401);
+            }
+
+            if ($user->role !== 'vendor') {
+                return response()->json([
+                    'message' => 'Access denied. Only vendors can log out.',
+                ], 403);
+            }
+
+            ActivityLogHelper::logActivity($user, 'LogOut', 'Vendor logged out');
+            $user->currentAccessToken()->delete();
+
+            return response()->json([
+                'message' => 'Logout successful'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Logout failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

@@ -66,7 +66,7 @@ class SocialiteController extends Controller
             }
 
             // Generate API token
-            $token = $user->createToken('YourApp')->plainTextToken;
+            $token = $user->createToken('API Token')->plainTextToken;
 
             return response()->json([
                 'message' => 'Login successful',

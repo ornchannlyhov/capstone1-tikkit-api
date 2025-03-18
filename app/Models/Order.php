@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'cart_id', 'total', 'status'];
+    protected $fillable = ['user_id', 'total', 'status'];
 
     public function user()
     {
@@ -18,7 +18,7 @@ class Order extends Model
 
     public function carts()
     {
-        return $this->hasMany(Cart::class);
+        return $this->belongsToMany(Cart::class, 'order_cart');
     }
 
     public function transaction()

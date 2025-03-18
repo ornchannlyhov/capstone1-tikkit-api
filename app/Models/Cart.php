@@ -9,14 +9,14 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'ticket_id', 'quantity'];
+    protected $fillable = ['user_id', 'ticket_id', 'quantity', 'event_id'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function ticketVariant()
+    public function ticketOption()
     {
         return $this->belongsTo(TicketOption::class, 'ticket_id');
     }

@@ -16,9 +16,10 @@ return new class extends Migration {
             $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->text('description');
+            $table->string('image')->nullable();
             $table->dateTime('startDate');
             $table->dateTime('endDate');
-            $table->enum('status', ['upcoming', 'active', 'passed'])->default('upcoming');
+            $table->enum('status', ['upcoming', 'active', 'passed','delay'])->default('upcoming');
             $table->timestamps();
             $table->softDeletes();
 
