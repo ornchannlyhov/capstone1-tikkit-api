@@ -79,27 +79,102 @@ class PurchasedTicketController extends Controller
     // Buyer: View purchased tickets
     public function viewPurchasedTicketsForBuyer(Request $request)
     {
-        $purchasedTickets = PurchasedTicket::where('user_id', auth()->id())
-            ->with('ticketOption.event')
-            ->get();
+        try {
+            $purchasedTickets = PurchasedTicket::where('user_id', auth()->id())
+                ->with(['ticketOption.event', 'offer']) 
+                ->get();
 
-        return response()->json([
-            'tickets' => $purchasedTickets,
-        ], 200);
+            // Format the response
+            $response = $purchasedTickets->map(function ($ticket) {
+                return [
+                    'ticket_id' => $ticket->id,
+                    'ticket_name' => $ticket->ticketOption->name,
+                    'ticket_price' => $ticket->ticketOption->price,
+                    'event' => [
+                        'event_name' => $ticket->ticketOption->event->name,
+                        'event_date' => $ticket->ticketOption->event->created_at, 
+                    ],
+                    'qr_code' => $ticket->qr_code,
+                    'status' => $ticket->status,
+                    'offer' => $ticket->offer ? [
+                        'offer_description' => $ticket->offer->description,
+                        'offer_discount' => $ticket->offer->discount_percentage . '%',
+                        'offer_start_date' => $ticket->offer->start_date,
+                        'offer_end_date' => $ticket->offer->end_date,
+                    ] : null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'tickets' => $response,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch purchased tickets: ' . $e->getMessage(),
+            ], 500);
+        }
     }
+
 
     // Vendor: View purchased tickets for their events
     public function viewPurchasedTicketsForVendor()
     {
-        $vendorId = auth()->id();
+        try {
+            $vendorId = auth()->id();
 
-        $tickets = PurchasedTicket::whereHas('ticketOption.event', function ($query) use ($vendorId) {
-            $query->where('user_id', $vendorId);
-        })->with('ticketOption.event')->get();
+            $tickets = PurchasedTicket::whereHas('ticketOption.event', function ($query) use ($vendorId) {
+                $query->where('user_id', $vendorId);
+            })
+                ->with(['ticketOption.event', 'offer'])
+                ->get();
 
-        return response()->json([
-            'tickets' => $tickets,
-        ], 200);
+            // Format the response
+            $response = $tickets->map(function ($ticket) {
+                return [
+                    'ticket_id' => $ticket->id,
+                    'ticket_name' => $ticket->ticketOption->name,
+                    'ticket_price' => $ticket->ticketOption->price,
+                    'event' => [
+                        'event_name' => $ticket->ticketOption->event->name,
+                        'event_date' => $ticket->ticketOption->event->created_at, 
+                    ],
+                    'qr_code' => $ticket->qr_code,
+                    'status' => $ticket->status,
+                    'offer' => $ticket->offer ? [
+                        'offer_description' => $ticket->offer->description,
+                        'offer_discount' => $ticket->offer->discount_percentage . '%',
+                        'offer_start_date' => $ticket->offer->start_date,
+                        'offer_end_date' => $ticket->offer->end_date,
+                    ] : null, 
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'tickets' => $response,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch purchased tickets: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Admin: View purchased tickets for a specific ticket option
+    public function viewPurchasedTicketsForAdmin($ticketOptionId)
+    {
+        try {
+            $tickets = PurchasedTicket::where('ticket_id', $ticketOptionId)
+                ->with('ticketOption')
+                ->get();
+            return view('dashboard.purchased_tickets.index', compact('tickets'));
+        } catch (\Exception $e) {
+            Log::error("Error viewing purchased tickets for admin: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return redirect()->route('dashboard.ticketOptions.index')->with('error', 'Failed to load purchased tickets.');
+        }
     }
 
     // Validate QR code (vendor function)
@@ -129,17 +204,4 @@ class PurchasedTicketController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Ticket Validated'], 200);
     }
 
-    // Admin: View purchased tickets for a specific ticket option
-    public function viewPurchasedTicketsForAdmin($ticketOptionId)
-    {
-        try {
-            $tickets = PurchasedTicket::where('ticket_id', $ticketOptionId)
-                ->with('ticketOption')
-                ->get();
-            return view('dashboard.purchased_tickets.index', compact('tickets'));
-        } catch (\Exception $e) {
-            Log::error("Error viewing purchased tickets for admin: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return redirect()->route('dashboard.ticketOptions.index')->with('error', 'Failed to load purchased tickets.');
-        }
-    }
 }
