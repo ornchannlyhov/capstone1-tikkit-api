@@ -1,4 +1,3 @@
-@props(['action', 'role' => 'vendor'])  <!-- Set default role to 'vendor' -->
 
 
 <!-- ✅ Flowbite Modal -->
