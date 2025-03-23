@@ -54,12 +54,9 @@ class PaymentTransactionController extends Controller
                 'currency' => $request->currency,
             ]);
 
-<<<<<<< HEAD
             ActivityLogHelper::logActivity(auth()->user(), 'initiated_payment', "Transaction ID: {$transaction->id}");
-=======
             // Update order status to paid
             $order->update(['status' => 'paid']);
->>>>>>> origin/develop
 
             ActivityLogHelper::logActivity(auth()->user(), 'Completed a payment', "Transaction ID: {$transaction->id}");
 
