@@ -18,7 +18,7 @@ class PurchasedTicket extends Model
         'status',
     ];
 
-    public function ticket()
+    public function ticketOption()
     {
         return $this->belongsTo(TicketOption::class, 'ticket_id');
     }
