@@ -42,7 +42,7 @@ class PurchasedTicketController extends Controller
 
         DB::beginTransaction();
         try {
-            $ticketOption->decrement('available_quantity', 1);
+            $ticketOption->decrement('quantity', 1);
 
             if ($offer && $offer->usage_limit !== null) {
                 $offer->decrement('usage_limit', 1);
