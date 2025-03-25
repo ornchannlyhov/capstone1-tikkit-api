@@ -117,115 +117,154 @@ class EventController extends Controller
         }
     }
 
-    // Web: List all events with no status filter by default
+    // Web: List all events with search
     public function index(Request $request)
     {
         try {
-            $status = $request->query('status', null);
-            $eventsQuery = Event::query();
-            if ($status) {
-                $eventsQuery->where('status', $status);
+            $query = Event::with(['user', 'category']); 
+    
+            if ($request->has('search')) {
+                $searchTerm = $request->search;
+                $query->where('name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('user', function ($q) use ($searchTerm) {
+                          $q->where('name', 'LIKE', "%{$searchTerm}%");
+                      });
             }
-            $events = $eventsQuery->get();
-            return view('dashboard.events.index', compact('events', 'status'));
-        } catch (Exception $e) {
+    
+            $events = $query->paginate(10);
+    
+            return view('dashboard.events.index', compact('events'));
+        } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error fetching events.');
         }
     }
-
-    // Web: Show event details
-    public function show($id)
-    {
-        try {
-            $event = Event::findOrFail($id);
-            return view('dashboard.events.show', compact('event'));
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('admin.events.index')->with('error', 'Event not found.');
-        } catch (Exception $e) {
-            return redirect()->route('admin.events.index')->with('error', 'Error loading event details.');
-        }
-    }
+    
 
     // Web: Create event
     public function create()
     {
-        return view('dashboard.events.create');
+        //fecth all categories
+        $categories = \App\Models\Category::all(); 
+        
+        return view('dashboard.events.create', compact('categories'));
     }
-
-    // Web: Store new event
+    
+     // Web: Store event
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string',
-                'description' => 'required|string',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'startDate' => 'required|date',
-                'endDate' => 'required|date|after:startDate',
-                'category_id' => 'required|exists:categories,id',
-                'status' => 'nullable|string|in:active,upcoming,completed'
-            ]);
-
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                $validated['image'] = $request->file('image')->store('events', 'public');
-            }
-
-            $event = Event::create($validated);
-
-            return redirect()->route('admin.events.index')->with('success', 'Event created successfully');
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create event.')->withInput();
+       
+        //get user id
+        $user_id = auth()->id();
+        
+        if (!$user_id) {
+            return redirect()->back()->withErrors('User not authenticated. Please log in.');
         }
+    
+        $request->validate([
+            'name' => 'required|string|max:191',
+            'category_id' => 'nullable|integer|exists:categories,id',
+            'startDate' => 'required|date',
+            'endDate' => 'required|date|after_or_equal:startDate',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|in:upcoming,active,passed,delay',
+        ]);
+        $request->merge(['user_id' => $user_id]);
+    
+        // Handle Image Upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->move(public_path('images'), $request->file('image')->getClientOriginalName());
+            $imagePath = 'images/' . $request->file('image')->getClientOriginalName();
+        }
+    
+        // Create event
+        Event::create([
+            'user_id' => $user_id,
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'image' => $imagePath,
+            'startDate' => $request->startDate,
+            'endDate' => $request->endDate,
+            'status' => $request->status,
+        ]);
+    
+        return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
-    // Web: Update event
-    public function update($id, Request $request)
+    
+    // Web: show event
+    public function show($id)
     {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string',
-                'description' => 'required|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'startDate' => 'required|date',
-                'endDate' => 'required|date|after:startDate',
-                'category_id' => 'required|exists:categories,id',
-                'status' => 'nullable|string|in:active,upcoming,completed'
-            ]);
-
-            $event = Event::findOrFail($id);
-
-            // Handle image upload if a new one is provided
-            if ($request->hasFile('image')) {
-                $validated['image'] = $request->file('image')->store('events', 'public');
-            }
-
-            $event->update($validated);
-
-            return redirect()->route('admin.events.index')->with('success', 'Event updated successfully');
-        } catch (ModelNotFoundException $e) {
-            return redirect()->route('admin.events.index')->with('error', 'Event not found.');
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update event.')->withInput();
-        }
+        $event = Event::findOrFail($id);
+        //fetch all caterogies
+        $categories = \App\Models\Category::all(); 
+        
+        return view('dashboard.events.edit', compact('event','categories'));
     }
+    // Web: update event
+    public function update(Request $request, $id)
+    {
+        $event = Event::findOrFail($id);
 
-    // Web: Delete event
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
+            'startDate' => 'required|date',
+            'endDate' => 'required|date|after_or_equal:startDate',
+            'description' => 'nullable|string',
+            'status' => 'required|in:upcoming,active,passed,delay',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        // Handle image upload
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($event->image && file_exists(public_path($event->image))) {
+                unlink(public_path($event->image));
+            }
+    
+            // Store new image
+            $path = $request->file('image')->move(public_path('images'), $request->file('image')->getClientOriginalName());
+            $event->image = 'images/' . $request->file('image')->getClientOriginalName();
+        }
+
+        // Update event details
+        $event->update([
+            'name' => $request->name,
+            'category_id' => $request->category_id,
+            'startDate' => $request->startDate,
+            'endDate' => $request->endDate,
+            'description' => $request->description,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('events.index')->with('success', 'Event updated successfully!');
+    }
+    // Web: delete event
     public function destroy($id)
     {
         try {
             $event = Event::findOrFail($id);
+
+            // Delete the image file if it exists
+            if ($event->image && file_exists(public_path($event->image))) {
+                unlink(public_path($event->image));
+            }
+            // Delete the event
             $event->delete();
-            return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
+
+            return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
         } catch (ModelNotFoundException $e) {
-            return redirect()->route('admin.events.index')->with('error', 'Event not found.');
+            return redirect()->route('events.index')->with('error', 'Event not found.');
         } catch (Exception $e) {
-            return redirect()->route('admin.events.index')->with('error', 'Failed to delete event.');
+            return redirect()->route('events.index')->with('error', 'Error deleting event.');
         }
     }
+
+
 
     // API: Toggle the event status manually (public/unpublic)
     public function togglePublic($id)
