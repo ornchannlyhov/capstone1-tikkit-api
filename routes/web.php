@@ -24,8 +24,11 @@ Route::get('/login', function () {
 Route::post('admin/login', [AuthenticatedSessionController::class, 'adminLogin'])->name('admin.login');
 Route::post('admin/logout', [AuthenticatedSessionController::class, 'adminLogout'])->name('admin.logout');
 
+
+
+
 // Admin Routes
-Route::prefix('dashboard')->middleware(['admin'])->group(function () {
+Route::prefix('dashboard')->middleware(['auth','admin'])->group(function () {
     // User Routes
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
@@ -39,6 +42,18 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
         Route::get('/search', [UserController::class, 'search'])->name('search');
     });
 
+
+    // Event Routes
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('create', [EventController::class, 'create'])->name('create');
+        Route::post('store', [EventController::class, 'store'])->middleware('auth')->name('store');
+        Route::get('/{id}', [EventController::class, 'show'])->name('show');
+        Route::put('{id}', [EventController::class, 'update'])->name('update');
+        Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
+// Web: Publish event (change status to active)
+
+    });
     // Vendor Routes
     Route::prefix('vendors')->name('vendors.')->group(function () {
         Route::get('/', [UserController::class, 'vendorIndex'])->name('index');
@@ -60,17 +75,7 @@ Route::prefix('dashboard')->middleware(['admin'])->group(function () {
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('destroy');
     });
 
-    // Event Routes
-    Route::prefix('events')->name('events.')->group(function () {
-        Route::get('/', [EventController::class, 'index'])->name('index');
-        Route::get('{id}', [EventController::class, 'show'])->name('show');
-        Route::get('create', [EventController::class, 'create'])->name('create');
-        Route::post('store', [EventController::class, 'store'])->name('store');
-        Route::put('{id}', [EventController::class, 'update'])->name('update');
-        Route::delete('{id}', [EventController::class, 'destroy'])->name('destroy');
-        Route::get('search', [EventController::class, 'search'])->name('search');
-        Route::post('{id}/toggle-public', [EventController::class, 'togglePublic'])->name('togglePublic');
-    });
+
 
     // Address Routes
     Route::prefix('addresses')->name('addresses.')->group(function () {

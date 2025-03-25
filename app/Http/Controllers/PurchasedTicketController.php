@@ -42,7 +42,7 @@ class PurchasedTicketController extends Controller
 
         DB::beginTransaction();
         try {
-            $ticketOption->decrement('available_quantity', 1);
+            $ticketOption->decrement('quantity', 1);
 
             if ($offer && $offer->usage_limit !== null) {
                 $offer->decrement('usage_limit', 1);
@@ -88,7 +88,7 @@ class PurchasedTicketController extends Controller
             $response = $purchasedTickets->map(function ($ticket) {
                 return [
                     'ticket_id' => $ticket->id,
-                    'ticket_name' => $ticket->ticketOption->name,
+                    'ticket_name' => $ticket->ticketOption->type,
                     'ticket_price' => $ticket->ticketOption->price,
                     'event' => [
                         'event_name' => $ticket->ticketOption->event->name,

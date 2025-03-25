@@ -7,6 +7,7 @@
     "dependencies": {
         "@popperjs/core": "^2.11.8",
         "@tailwindcss/vite": "^4.0.6",
+        "bakong-khqr": "^1.0.7",
         "bootstrap": "^5.3.3",
         "flowbite": "^3.1.2",
         "laravel-vite-plugin": "^1.2.0"

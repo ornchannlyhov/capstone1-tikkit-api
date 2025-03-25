@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -16,6 +17,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('ticket_id');
             $table->decimal('quantity', 10, 2);
             $table->unsignedBigInteger('event_id')->nullable();
+            $table->enum('status', ['pending', 'completed', 'cancel_request', 'cancelled'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
 

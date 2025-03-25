@@ -55,6 +55,10 @@ class PaymentTransactionController extends Controller
             ]);
 
             ActivityLogHelper::logActivity(auth()->user(), 'initiated_payment', "Transaction ID: {$transaction->id}");
+            // Update order status to paid
+            $order->update(['status' => 'paid']);
+
+            ActivityLogHelper::logActivity(auth()->user(), 'Completed a payment', "Transaction ID: {$transaction->id}");
 
             return response()->json(['message' => 'Payment transaction recorded successfully', 'transaction' => $transaction], 201);
         } catch (Exception $e) {

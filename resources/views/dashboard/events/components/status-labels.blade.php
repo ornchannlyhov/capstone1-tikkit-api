@@ -1,7 +1,15 @@
-@if($status === 'active')
-    <span class="px-2 py-1 bg-green-600 text-white rounded-lg">Active</span>
-@elseif($status === 'upcoming')
-    <span class="px-2 py-1 bg-yellow-500 text-white rounded-lg">Upcoming</span>
-@else
-    <span class="px-2 py-1 bg-red-500 text-white rounded-lg">Completed</span>
-@endif
+@php
+    $statusClasses = [
+        'active' => 'bg-green-500 text-white',
+        'complete' => 'bg-black text-white',
+        'upcoming' => 'bg-blue-500 text-white',
+        // Add more status classes if needed
+    ];
+
+    // Default status class for undefined status
+    $statusClass = $statusClasses[$status] ?? 'bg-gray-500 text-white';
+@endphp
+
+<span class="px-3 py-1 rounded-full {{ $statusClass }}">
+    {{ ucfirst($status) }}
+</span>

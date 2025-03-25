@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
+use App\Models\User;
 use Carbon\Carbon;
 
 class Event extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'image', 'startDate', 'endDate', 'category_id', 'status'];
+    protected $fillable = ['user_id','name', 'description', 'image', 'startDate', 'endDate', 'category_id', 'status'];
 
     public function category()
     {
@@ -45,4 +47,3 @@ class Event extends Model
         $this->save();
     }
 }
-
