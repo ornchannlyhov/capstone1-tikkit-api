@@ -28,12 +28,25 @@ class CategoryController extends Controller
         }
     }
 
-    // get all category (web)
-    public function index()
+
+    public function index(Request $request)
     {
-        $categories = Category::all();
+        $categories = Category::query(); // Start with the query builder
+
+        // Check if the search term is present
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            // Apply the search condition
+            $categories->where('name', 'LIKE', "%{$searchTerm}%");
+        }
+
+        // Get the results after applying any filters
+        $categories = $categories->get();
+
         return view('dashboard.categories.index', compact('categories'));
     }
+
+    
 
     public function create()
     {

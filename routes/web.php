@@ -71,7 +71,7 @@ Route::prefix('dashboard')->middleware(['auth','admin'])->group(function () {
         Route::post('store', [CategoryController::class, 'store'])->name('store');
         Route::get('{category}', [CategoryController::class, 'show'])->name('show');
         Route::get('{category}/edit', [CategoryController::class, 'edit'])->name('edit');
-        Route::put('{category}', [CategoryController::class, 'update'])->name('update');
+        Route::put('{category}/update', [CategoryController::class, 'update'])->name('update');
         Route::delete('{category}', [CategoryController::class, 'destroy'])->name('destroy');
     });
 
