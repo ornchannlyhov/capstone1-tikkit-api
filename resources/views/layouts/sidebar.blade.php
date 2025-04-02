@@ -15,12 +15,6 @@
                     <i class="fas fa-users"></i> Users
                 </a>
             </li>
-            </li>
-            <li class="{{ request()->is('dashboard/categories*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
-    <a href="{{ route('categories.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
-        <i class="fas fa-tags"></i> Categories
-    </a>
-</li>
             <li class="{{ request()->is('dashboard/events*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="{{ route('events.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-calendar-alt"></i> Events
@@ -30,20 +24,15 @@
                 <a href="{{ route('addresses.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-map-marker-alt"></i> Addresses
                 </a>
-                </li>
-                <li class="{{ request()->is('dashboard/payment*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
-    <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
-        <i class="fas fa-tags"></i> Payments
-    </a>
-</li>
-
-        
-
-            <li class="{{ request()->is('dashboard/orders*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
-                <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+            </li>
+            <li class="{{ request()->is('admin/orders*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-box"></i> Orders
                 </a>
             </li>
+            
+            
+            
             <li class="{{ request()->is('dashboard/products*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-cube"></i> Product

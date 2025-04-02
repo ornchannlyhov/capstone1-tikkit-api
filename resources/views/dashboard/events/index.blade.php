@@ -59,7 +59,7 @@
                             <td class="px-3 py-4 text-gray-600">{{ $event->category ? $event->category->name : 'No Category' }}</td>
 
                             <!-- Status Column -->
-                            <td class="px-3 py-4">
+                            <td class="px-2 py-4">
                                 @php
                                     $statusColor = '';
                                     $statusText = '';
