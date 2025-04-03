@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ class ActivityLog extends Model
 
     protected $fillable = ['user_id', 'activity', 'details', 'created_at', 'ip_address', 'device'];
 
-    public $timestamps = false; 
+    public $timestamps = false;
 
     public function user()
     {

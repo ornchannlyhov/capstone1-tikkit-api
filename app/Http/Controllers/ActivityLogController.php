@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ActivityLogHelper;
 use Illuminate\Http\Request;
+use App\Models\ActivityLog;
 
 class ActivityLogController extends Controller
 {
@@ -14,6 +15,9 @@ class ActivityLogController extends Controller
 
         return view('admin.transaction_logs', ['transactionLogs' => $transactionLogs]);
     }
+
+
+// Removed redundant code outside of a function
 
     // Display All Activity Logs (Web View)
     public function allLogs()

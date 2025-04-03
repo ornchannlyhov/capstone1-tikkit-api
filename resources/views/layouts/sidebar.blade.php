@@ -15,6 +15,11 @@
                     <i class="fas fa-users"></i> Users
                 </a>
             </li>
+            <li class="{{ request()->is('dashboard/categories*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('categories.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-tags"></i> Categories
+                </a>
+            </li>
             <li class="{{ request()->is('dashboard/events*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="{{ route('events.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-calendar-alt"></i> Events
@@ -25,14 +30,16 @@
                     <i class="fas fa-map-marker-alt"></i> Addresses
                 </a>
             </li>
-            <li class="{{ request()->is('admin/orders*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
-                <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+            <li class="{{ request()->is('dashboard/payment*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-money-bill"></i> Payments
+                </a>
+            </li>
+            <li class="{{ request()->is('dashboard/orders*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-box"></i> Orders
                 </a>
             </li>
-            
-            
-            
             <li class="{{ request()->is('dashboard/products*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-cube"></i> Product
@@ -43,15 +50,31 @@
                     <i class="fas fa-chart-line"></i> Analytics
                 </a>
             </li>
+
+            <!-- New Activity & Transaction Logs Menu Items -->
+            <li class="{{ request()->is('transaction-logs') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('admin.transaction_logs') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-file-alt"></i> Transaction
+                </a>
+            </li>
+            <li class="{{ request()->is('activity-logs') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('admin.activity_logs') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-list"></i> Activity Logs
+                </a>
+            </li>
+
         </ul>
     </nav>
 
     <div class="p-4">
-        <form action="{{ route('admin.logout') }}" method="POST" class="w-full">
+        <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="w-full hidden">
             @csrf
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded w-full text-center hover:bg-green-700">
-                Log Out
-            </button>
         </form>
+        
+        <button type="button"
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+            class="px-4 py-2 bg-green-600 text-white rounded w-full text-center hover:bg-green-700">
+            Log Out
+        </button>
     </div>
 </aside>
