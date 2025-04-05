@@ -15,7 +15,7 @@ class AddressController extends Controller
     public function index()
     {
         try {
-            $addresses = Address::all(); // Fetch addresses
+            $addresses = Address::paginate(0); // Fetch addresses
             $events = Event::all(); // Fetch events for the modal
             return view('dashboard.addresses.index', compact('addresses', 'events'));
         } catch (Exception $e) {

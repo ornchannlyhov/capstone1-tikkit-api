@@ -7,10 +7,7 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold text-gray-700">Payment Management</h1>
-
         </div>
-
-      
 
         <!-- transaction Table -->
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -52,6 +49,11 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-4">
+            {{ $transactions->links() }}
         </div>
 
 

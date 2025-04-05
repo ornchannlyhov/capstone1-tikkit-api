@@ -14,7 +14,7 @@ class PaymentTransactionController extends Controller
     // Admin: View all transactions (web route)
     public function index()
     {
-        $transactions = PaymentTransaction::with(['user', 'order'])->get();
+        $transactions = PaymentTransaction::with(['user', 'order'])->paginate(10);
         return view('dashboard.payment.index', compact('transactions'));
     }
 
