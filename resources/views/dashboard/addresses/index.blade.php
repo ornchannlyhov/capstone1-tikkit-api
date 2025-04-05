@@ -71,6 +71,11 @@
                 </table>
             </div>
         </div>
+        
+        <!-- Pagination -->
+        <div class="mt-4">
+            {{ $addresses->links() }}
+        </div>
     </div>
 </div>
 

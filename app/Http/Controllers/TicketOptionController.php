@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Event;
 use App\Models\TicketOption;
 use Illuminate\Http\Request;
@@ -60,67 +61,75 @@ class TicketOptionController extends Controller
             ], 500);
         }
     }
-    // Show all TicketOptions for an event
-    public function index($id)
+
+
+    public function index(Request $request)
     {
-        try {
-            $ticketOptions = TicketOption::where('event_id', $id)->get();
-            return view('dashboard.ticketOptions.index', compact('ticketOptions', 'id'));
-        } catch (\Exception $e) {
-            return redirect()->route('events.index')->with('error', 'Failed to fetch ticket options.');
+        $query = TicketOption::query();
+
+        if ($request->has('event_id') && $request->event_id) {
+            $query->where('event_id', $request->event_id);
         }
+
+        if ($request->has('search') && $request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('type', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $sortBy = $request->get('sort_by', 'id');
+        $sortOrder = $request->get('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $ticketOptions = $query->paginate(10);
+        $events = Event::all();
+
+        $event = $events->first();
+
+        return view('dashboard.ticketOptions.index', compact('ticketOptions', 'events', 'event' , 'sortBy', 'sortOrder'));
     }
 
     // Show the form for creating a new TicketOption for an event
-    public function create($id)
+    public function create()
     {
         try {
-            $event = Event::findOrFail($id);
-            return view('dashboard.ticketOptions.create', compact('id', 'event'));
+            $events = Event::all();
+            return view('dashboard.ticketOptions.create', compact('events'));
         } catch (\Exception $e) {
-            return redirect()->route('ticketOptions.index', $id)->with('error', 'Event not found or error fetching event details.');
+            return redirect()->route('ticketOptions.index')->with('error', 'Event not found or error fetching event details.');
         }
     }
 
     // Store a newly created TicketOption for an event
-    public function store(Request $request, $id)
+    public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'type' => 'required|string|max:255',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
             'is_active' => 'required|boolean',
-            'refund_policy' => 'nullable|string',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'startDate' => 'nullable|date',
             'endDate' => 'nullable|date|after_or_equal:startDate',
+            'description' => 'nullable|string',
+            'refund_policy' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
+            'event_id' => 'required|exists:events,id',
         ]);
 
         try {
-            $event = Event::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+            $ticketOption = TicketOption::create($validated);
 
-            $imagePath = null;
+    
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('ticket_options', 'public');
+                $ticketOption->image = $request->file('image')->store('ticket-options', 'public');
             }
-
-            TicketOption::create([
-                'event_id' => $id,
-                'type' => $request->type,
-                'price' => $request->price,
-                'quantity' => $request->quantity,
-                'is_active' => $request->is_active,
-                'refund_policy' => $request->refund_policy,
-                'description' => $request->description,
-                'image' => $imagePath,
-                'startDate' => $request->startDate,
-                'endDate' => $request->endDate,
-            ]);
-
-            return redirect()->route('ticketOptions.index', $id)->with('success', 'Ticket Option created successfully');
+    
+            $ticketOption->save();
+    
+            return redirect()->route('ticketOptions.index')->with('success', 'Ticket Option created successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('ticketOptions.index', $id)->with('error', 'Failed to create Ticket Option: ' . $e->getMessage());
+            return redirect()->route('ticketOptions.index')->with('error', 'Failed to create Ticket Option.');
         }
     }
 
@@ -129,7 +138,8 @@ class TicketOptionController extends Controller
     {
         try {
             $ticketOption = TicketOption::findOrFail($id);
-            return view('dashboard.ticketOptions.edit', compact('ticketOption'));
+            $events = Event::all();
+            return view('dashboard.ticketOptions.edit', compact('ticketOption' , 'events'));
         } catch (\Exception $e) {
             return redirect()->route('ticketOptions.index')->with('error', 'Ticket Option not found.');
         }
@@ -148,20 +158,20 @@ class TicketOptionController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'startDate' => 'nullable|date',
             'endDate' => 'nullable|date|after_or_equal:startDate',
+            'event_id' => 'required|exists:events,id',
         ]);
-
+    
         try {
             $ticketOption = TicketOption::findOrFail($id);
-            $event = Event::findOrFail($ticketOption->event_id);
-
+    
             if ($request->hasFile('image')) {
                 if ($ticketOption->image) {
                     Storage::disk('public')->delete($ticketOption->image);
                 }
-                $imagePath = $request->file('image')->store('ticket_options', 'public');
+                $imagePath = $request->file('image')->store('ticket-options', 'public');
                 $ticketOption->image = $imagePath;
             }
-
+    
             $ticketOption->update([
                 'type' => $request->type,
                 'price' => $request->price,
@@ -171,9 +181,10 @@ class TicketOptionController extends Controller
                 'description' => $request->description,
                 'startDate' => $request->startDate,
                 'endDate' => $request->endDate,
+                'event_id' => $request->event_id,
             ]);
-
-            return redirect()->route('ticketOptions.index', $ticketOption->event_id)->with('success', 'Ticket Option updated successfully');
+    
+            return redirect()->route('ticketOptions.index')->with('success', 'Ticket Option updated successfully');
         } catch (\Exception $e) {
             return redirect()->route('ticketOptions.index')->with('error', 'Failed to update Ticket Option: ' . $e->getMessage());
         }

@@ -29,52 +29,86 @@ class TicketOfferController extends Controller
             ], 403); 
         }
     }
-    // Display all offers for a specific ticket option
-    public function index($ticketOptionId)
-    {
-        try {
-            $ticketOption = TicketOption::findOrFail($ticketOptionId);
-            $ticketOffers = $ticketOption->ticketOffers()->paginate(10);
-            return view('dashboard.ticketOffers.index', compact('ticketOffers', 'ticketOption'));  // Updated path
-        } catch (\Exception $e) {
-            return redirect()->route('ticketOptions.index')->with('error', 'Ticket Option not found.');
+    // // Display all offers for a specific ticket option
+    // public function index()
+    // {
+    //     try {
+
+    //         $ticketOffers = TicketOffer::with('ticketOption' , 'purchasedTickets')->paginate(10);
+
+    //         return view('dashboard.ticketOffers.index', compact('ticketOffers'));
+    //     } catch (\Exception $e) {
+    //         return redirect()->route('ticketOptions.index')->with('error', 'Ticket Option not found.');
+    //     }
+    // }
+
+    
+public function index(Request $request)
+{
+    try {
+        $query = TicketOffer::with('ticketOption', 'purchasedTickets');
+
+        // Search by name
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
+
+        // Filter by ticket option
+        if ($request->has('ticket_option_id') && $request->ticket_option_id != '') {
+            $query->where('ticket_id', $request->ticket_option_id);
+        }
+
+        // Sort by column
+        if ($request->has('sort_by') && $request->sort_by != '') {
+            $sortOrder = $request->get('sort_order', 'asc'); // Default to ascending order
+            $query->orderBy($request->sort_by, $sortOrder);
+        }
+
+        $ticketOffers = $query->paginate(10);
+
+        // Pass ticket options for the filter dropdown
+        $ticketOptions = TicketOption::all();
+
+        return view('dashboard.ticketOffers.index', compact('ticketOffers', 'ticketOptions'));
+    } catch (\Exception $e) {
+        return redirect()->route('ticketOptions.index')->with('error', 'Failed to load ticket offers.');
     }
+}
+    
 
     // Show form to create a new ticket offer
-    public function create($ticketOptionId)
+    public function create()
     {
         try {
-            $ticketOption = TicketOption::findOrFail($ticketOptionId);
-            return view('dashboard.ticketOffers.create', compact('ticketOption'));  // Updated path
+            $ticketOptions = TicketOption::all(); 
+            return view('dashboard.ticketOffers.create', compact('ticketOptions'));
         } catch (\Exception $e) {
-            return redirect()->route('ticketOptions.index')->with('error', 'Ticket Option not found.');
+            return redirect()->route('ticketOptions.index')->with('error', 'Failed to load ticket options.');
         }
     }
 
-    // Store a new ticket offer
-    public function store(Request $request, $ticketOptionId)
+    public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'ticket_option_id' => 'required|exists:ticket_options,id', 
             'name' => 'required|string|max:255',
-            'details' => 'required|string',
-            'quantity' => 'required|integer|min:1',
+            'details' => 'required|array', 
+            'details.discount' => 'required|string|max:10',
+            'details.valid_until' => 'required|date',
+            'quantity' => 'required|numeric|min:1',
         ]);
-
+    
         try {
-            $ticketOption = TicketOption::findOrFail($ticketOptionId);
-
-            $ticketOffer = new TicketOffer([
-                'name' => $request->name,
-                'details' => $request->details,
-                'quantity' => $request->quantity,
-            ]);
-
-            $ticketOption->ticketOffers()->save($ticketOffer);
-
-            return redirect()->route('ticketOffers.index', $ticketOptionId)->with('success', 'Ticket offer created successfully.');
+            $validated['ticket_id'] = $validated['ticket_option_id'];
+            unset($validated['ticket_option_id']);
+    
+            $validated['details'] = json_encode($validated['details']);
+    
+            $ticketOffer = TicketOffer::create($validated);
+    
+            return redirect()->route('ticketOffers.index')->with('success', 'Ticket offer created successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('ticketOptions.index')->with('error', 'Failed to create ticket offer.');
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -83,32 +117,33 @@ class TicketOfferController extends Controller
     {
         try {
             $ticketOffer = TicketOffer::findOrFail($ticketOfferId);
-            return view('dashboard.ticketOffers.edit', compact('ticketOffer'));  // Updated path
+            return view('dashboard.ticketOffers.edit', compact('ticketOffer'));
         } catch (\Exception $e) {
-            return redirect()->route('ticketOffers.index', $ticketOffer->ticket_id)->with('error', 'Ticket offer not found.');
+            return redirect()->route('ticketOffers.index')->with('error', 'Ticket offer not found.');
         }
     }
 
     // Update the details of a specific ticket offer
     public function update(Request $request, $ticketOfferId)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'details' => 'required|string',
-            'quantity' => 'required|integer|min:1',
+            'details' => 'required|array',
+            'details.discount' => 'required|string|max:10',
+            'details.valid_until' => 'required|date',
+            'quantity' => 'required|numeric|min:1',
         ]);
-
+    
         try {
             $ticketOffer = TicketOffer::findOrFail($ticketOfferId);
-            $ticketOffer->update([
-                'name' => $request->name,
-                'details' => $request->details,
-                'quantity' => $request->quantity,
-            ]);
-
-            return redirect()->route('ticketOffers.index', $ticketOffer->ticket_id)->with('success', 'Ticket offer updated successfully.');
+    
+            $validated['details'] = json_encode($validated['details']);
+    
+            $ticketOffer->update($validated);
+    
+            return redirect()->route('ticketOffers.index')->with('success', 'Ticket offer updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('ticketOffers.index')->with('error', 'Failed to update ticket offer.');
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 

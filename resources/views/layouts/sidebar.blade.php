@@ -25,6 +25,12 @@
                     <i class="fas fa-tags"></i> Categories
                 </a>
             </li>
+            </li>
+            <li class="{{ request()->is('dashboard/categories*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('categories.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-tags"></i> Categories
+                </a>
+            </li>
             <li class="{{ request()->is('dashboard/events*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="{{ route('events.index') }}"
                     class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
@@ -37,6 +43,15 @@
                     class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-map-marker-alt"></i> Addresses
                 </a>
+            </li>
+            <li class="{{ request()->is('dashboard/payment*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-tags"></i> Payments
+                </a>
+            </li>
+
+
+
             </li>
             <li class="{{ request()->is('dashboard/payment*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="{{ route('admin.payments.index') }}"
@@ -55,6 +70,22 @@
                     <i class="fas fa-cube"></i> Product
                 </a>
             </li>
+
+            <li class="{{ request()->is('dashboard/ticket-options*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('ticketOptions.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-tags"></i> Ticket Options
+                </a>
+            </li>
+
+            <li class="{{ request()->is('dashboard/ticket-offers*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="{{ route('ticketOffers.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-tags"></i> Ticket Offers
+                </a>
+            </li>
+
+            <li class="{{ request()->is('dashboard/analytics*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
+                <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                    <i class="fas fa-chart-line"></i> Analytics
 
 
             <!-- New Activity & Transaction Logs Menu Items -->

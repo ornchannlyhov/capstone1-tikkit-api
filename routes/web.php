@@ -91,9 +91,9 @@ Route::prefix('dashboard')->middleware(['auth','admin'])->group(function () {
 
     // TicketOption Routes
     Route::prefix('ticket-options')->name('ticketOptions.')->group(function () {
-        Route::get('event/{id}', [TicketOptionController::class, 'index'])->name('index');
-        Route::get('event/{id}/create', [TicketOptionController::class, 'create'])->name('create');
-        Route::post('event/{id}/store', [TicketOptionController::class, 'store'])->name('store');
+        Route::get('event', [TicketOptionController::class, 'index'])->name('index');
+        Route::get('event/create', [TicketOptionController::class, 'create'])->name('create');
+        Route::post('event/store', [TicketOptionController::class, 'store'])->name('store');
         Route::get('edit/{id}', [TicketOptionController::class, 'edit'])->name('edit');
         Route::put('update/{id}', [TicketOptionController::class, 'update'])->name('update');
         Route::delete('destroy/{id}', [TicketOptionController::class, 'destroy'])->name('destroy');
@@ -101,9 +101,9 @@ Route::prefix('dashboard')->middleware(['auth','admin'])->group(function () {
 
     // TicketOffer Routes
     Route::prefix('ticket-offers')->name('ticketOffers.')->group(function () {
-        Route::get('ticket-option/{ticketOptionId}', [TicketOfferController::class, 'index'])->name('index');
-        Route::get('ticket-option/{ticketOptionId}/create', [TicketOfferController::class, 'create'])->name('create');
-        Route::post('ticket-option/{ticketOptionId}/store', [TicketOfferController::class, 'store'])->name('store');
+        Route::get('ticket-option', [TicketOfferController::class, 'index'])->name('index');
+        Route::get('ticket-option/create', [TicketOfferController::class, 'create'])->name('create');
+        Route::post('ticket-option/store', [TicketOfferController::class, 'store'])->name('store');
         Route::get('edit/{ticketOfferId}', [TicketOfferController::class, 'edit'])->name('edit');
         Route::put('update/{ticketOfferId}', [TicketOfferController::class, 'update'])->name('update');
         Route::delete('destroy/{ticketOfferId}', [TicketOfferController::class, 'destroy'])->name('destroy');
