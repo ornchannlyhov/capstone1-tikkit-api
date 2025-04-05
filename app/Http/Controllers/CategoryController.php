@@ -39,9 +39,9 @@ class CategoryController extends Controller
             // Apply the search condition
             $categories->where('name', 'LIKE', "%{$searchTerm}%");
         }
+        $categories = $categories->paginate(10);
 
-        // Get the results after applying any filters
-        $categories = $categories->get();
+   
 
         return view('dashboard.categories.index', compact('categories'));
     }

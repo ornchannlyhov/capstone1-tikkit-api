@@ -29,6 +29,7 @@ class UserController extends Controller
             }
             $users = $usersQuery->paginate(10);
 
+
             return view('dashboard.users.index', compact('users', 'role'));
         } catch (Exception $e) {
             return redirect()->route('users.index')->with('error', 'Failed to fetch users: ' . $e->getMessage());

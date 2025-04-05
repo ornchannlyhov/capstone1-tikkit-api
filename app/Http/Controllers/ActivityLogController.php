@@ -11,7 +11,7 @@ class ActivityLogController extends Controller
     // Display Transaction Logs (Web View)
     public function index()
     {
-        $transactionLogs = ActivityLogHelper::getAllTransactionLogs();
+        $transactionLogs = ActivityLog::paginate(10);
 
         return view('admin.transaction_logs', ['transactionLogs' => $transactionLogs]);
     }
@@ -22,7 +22,7 @@ class ActivityLogController extends Controller
     // Display All Activity Logs (Web View)
     public function allLogs()
     {
-        $activityLogs = ActivityLogHelper::getAllActivityLogs();
+        $activityLogs = ActivityLog::paginate(10);
 
         return view('admin.activity_logs', ['activityLogs' => $activityLogs]);
     }
