@@ -52,6 +52,7 @@
 
 
 
+
             </li>
             <li class="{{ request()->is('dashboard/payment*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="{{ route('admin.payments.index') }}"
@@ -60,10 +61,12 @@
                 </a>
             </li>
             <li class="{{ request()->is('dashboard/orders*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
-                <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
+                <a href="{{ route('admin.orders.index') }}" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-box"></i> Orders
                 </a>
             </li>
+
+           
             <li
                 class="{{ request()->is('dashboard/products*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
@@ -83,6 +86,7 @@
                 </a>
             </li>
 
+        
             <li class="{{ request()->is('dashboard/analytics*') ? 'bg-black text-white' : '' }} rounded-md w-3/4 mx-auto">
                 <a href="#" class="flex items-center gap-2 text-lg py-2 px-3 hover:bg-gray-300 rounded-md">
                     <i class="fas fa-chart-line"></i> Analytics

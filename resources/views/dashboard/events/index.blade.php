@@ -101,7 +101,7 @@
                             <!-- Action Buttons -->
                             <td class="px-4 py-4 text-center flex justify-center space-x-2">
                                 <a href="{{ route('events.show', $event->id) }}" 
-                                    class="px-2 py-2 bg-[#030f0f] text-white rounded-md shadow-md hover:bg-gray-700 transition flex items-center space-x-2">
+                                    class="px-2 py-2 bg-[#19b921] text-white rounded-md shadow-md hover:bg-gray-700 transition flex items-center space-x-2">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
