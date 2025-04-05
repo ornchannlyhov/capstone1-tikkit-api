@@ -54,6 +54,7 @@
                                 <a href="{{ route('categories.edit', $category->id) }}"
                                     class="px-3 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600 transition duration-200">
                                     <i class="fas fa-edit"></i>
+                             
                                 </a>
 
                                 <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="inline">
@@ -63,6 +64,7 @@
                                         class="px-3 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 transition duration-200"
                                         onclick="return confirm('Are you sure you want to delete this category?')">
                                         <i class="fas fa-trash"></i>
+                                        
                                     </button>
                                 </form>
                             </td>

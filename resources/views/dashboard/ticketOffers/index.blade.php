@@ -60,36 +60,40 @@
             <table class="min-w-full border-collapse border table-auto">
                 <thead class="bg-gray-800 text-white">
                     <tr>
-                        <th class="px-4 py-2">Name</th>
-                        <th class="px-4 py-2">Discount</th>
-                        <th class="px-4 py-2">Valid Until</th>
-                        <th class="px-4 py-2">Quantity</th>
-                        <th class="px-4 py-2">Actions</th>
+                        <th class="px-4 py-2 text-center">Name</th>
+                        <th class="px-4 py-2 text-center">Discount</th>
+                        <th class="px-4 py-2 text-center">Valid Until</th>
+                        <th class="px-4 py-2 text-center">Quantity</th>
+                        <th class="px-4 py-2 text-center">Actions</th> <!-- Centered Actions Header -->
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($ticketOffers as $ticketOffer)
                         <tr class="border-b">
-                            <td class="px-4 py-2">{{ $ticketOffer->name }}</td>
-                            <td class="px-4 py-2">
+                            <td class="px-4 py-2 text-center">{{ $ticketOffer->name }}</td>
+                            <td class="px-4 py-2 text-center">
                                 @php
                                     $details = json_decode($ticketOffer->details, true);
                                 @endphp
                                 {{ $details['discount'] ?? 'N/A' }}
                             </td>
-                            <td class="px-4 py-2">
+                            <td class="px-4 py-2 text-center">
                                 @php
                                     $details = json_decode($ticketOffer->details, true);
                                 @endphp
                                 {{ $details['valid_until'] ?? 'N/A' }}
                             </td>
-                            <td class="px-4 py-2">{{ $ticketOffer->quantity }}</td>
-                            <td class="px-4 py-2 flex space-x-2">
-                                <a href="{{ route('ticketOffers.edit', $ticketOffer->id) }}" class="px-2 py-1 bg-blue-500 text-white rounded">Edit</a>
+                            <td class="px-4 py-2 text-center">{{ $ticketOffer->quantity }}</td>
+                            <td class="px-4 py-2 flex justify-center space-x-4">
+                                <a href="{{ route('ticketOffers.edit', $ticketOffer->id) }}" class="px-2 py-1 bg-[#19b921] text-white rounded flex justify-center items-center">
+                                    <i class="fas fa-edit"></i> <!-- Edit icon -->
+                                </a>
                                 <form action="{{ route('ticketOffers.destroy', $ticketOffer->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                                    <button type="submit" class="px-2 py-1 bg-red-500 text-white rounded flex justify-center items-center">
+                                        <i class="fas fa-trash"></i> <!-- Delete icon -->
+                                    </button>
                                 </form>
                             </td>
                         </tr>

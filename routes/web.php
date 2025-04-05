@@ -110,7 +110,7 @@ Route::prefix('dashboard')->middleware(['auth','admin'])->group(function () {
     });
 
     // Order management Routes
-    Route::prefix('orders')->middleware(['auth', 'role:admin'])->name('admin.orders.')->group(function () {
+        Route::prefix('orders')->middleware(['auth', 'admin'])->name('admin.orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('{id}', [OrderController::class, 'show'])->name('show');
         Route::get('cancellation-requests', [OrderController::class, 'viewCancellationRequests'])->name('cancellation-requests');
