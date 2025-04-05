@@ -37,9 +37,9 @@
                             <td class="px-6 py-4 text-center flex justify-center space-x-4">
                                 <!-- ✅ Edit Button -->
                                 <a href="#" onclick="openEditAddressModal({{ $address->id }}, '{{ $address->street }}', '{{ $address->city }}', '{{ $address->country }}', '{{ $address->venue_name }}', '{{ $address->extra_info }}', '{{ $address->event_id }}')"
-                                    class="px-3 py-2 bg-primary text-white rounded-md shadow-md hover:bg-green-800 transition flex items-center space-x-2">
+                                    class="px-3 py-2 bg-[#19b921] text-white rounded-md shadow-md hover:bg-green-800 transition flex items-center space-x-2">
                                     <i class="fas fa-edit"></i>
-                                    <span>Edit</span>
+                                  
                                 </a>
                                 
                                 <!-- ✅ Select Event Dropdown -->
@@ -57,7 +57,7 @@
                                     <button type="submit"
                                         class="px-3 py-2 bg-danger text-white rounded-md shadow-md hover:bg-red-700 transition flex items-center space-x-2">
                                         <i class="fas fa-trash"></i>
-                                        <span>Delete</span>
+                                       
                                     </button>
                                 </form>
                             </td>

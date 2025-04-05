@@ -75,9 +75,9 @@
                                     </button>
                                 @else
                                     <a href="#" onclick="openEditUserModal({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->phone_number }}', '{{ $user->role }}')"
-                                        class="px-3 py-2 bg-[#030f0f] text-white rounded-md shadow-md hover:bg-gray-700 transition flex items-center space-x-2">
+                                        class="px-3 py-2 bg-[#21c244] text-white rounded-md shadow-md hover:bg-gray-700 transition flex items-center space-x-2">
                                         <i class="fas fa-edit"></i>
-                                        <span>Edit</span>
+                                      
                                     </a>
                     
                                     <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
@@ -86,7 +86,7 @@
                                         <button type="submit"
                                             class="px-3 py-2 bg-[#FD2942] text-white rounded-md shadow-md hover:bg-[#e52835] transition flex items-center space-x-2">
                                             <i class="fas fa-trash"></i>
-                                            <span>Delete</span>
+                                           
                                         </button>
                                     </form>
                                 @endif

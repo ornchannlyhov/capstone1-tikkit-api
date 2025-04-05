@@ -11,18 +11,59 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    // Admin: View all orders (web)
-    public function index()
-    {
-        $orders = Order::with('user')->get();
-        return view('admin.orders.index', compact('orders'));
-    }
+    // public function index(Request $request)
+    // {
+    //     $orders = Order::with('user', 'transaction')->paginate(10);
+        
+    //     return view('dashboard.orders.index', compact('orders'));
+    // }
+    
+    public function index(Request $request)
+{
+    try {
+        $query = Order::with('user', 'transaction');
 
-    // Admin: View a specific order (web)
+        // Search by Order ID
+        if ($request->has('search') && $request->search != '') {
+            $query->where('id', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by order status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Sort by column
+        if ($request->has('sort_by') && $request->sort_by != '') {
+            $sortOrder = $request->get('sort_order', 'asc'); // Default to ascending order
+            $query->orderBy($request->sort_by, $sortOrder);
+        }
+
+        // Paginate results
+        $orders = $query->paginate(10);
+
+        return view('dashboard.orders.index', compact('orders'));
+    } catch (\Exception $e) {
+        return redirect()->route('orders.index')->with('error', 'Failed to load orders.');
+    }
+}
+
+    
+    
+    
+    
+
+
+
     public function show($id)
     {
-        $order = Order::with(['user', 'carts'])->findOrFail($id);
-        return view('admin.orders.show', compact('order'));
+        $order = Order::with([
+            'user',
+            'carts.ticketOption',
+            'transaction.paymentMethod'
+        ])->findOrFail($id);
+
+        return view('dashboard.orders.show', compact('order'));
     }
 
     // Admin: View all cancellation requests (API)
@@ -31,7 +72,7 @@ class OrderController extends Controller
         try {
             $cancellationRequests = Order::where('status', 'cancel_request')->get();
             return view('admin.orders.cancellation_requests', compact('cancellationRequests'));
-        } catch (Exception $e) {
+        } catch (Exception $e) { 
             return view('admin.orders.error', ['error' => 'Failed to retrieve cancellation requests', 'details' => $e->getMessage()]);
         }
     }

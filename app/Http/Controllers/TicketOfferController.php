@@ -29,18 +29,7 @@ class TicketOfferController extends Controller
             ], 403); 
         }
     }
-    // // Display all offers for a specific ticket option
-    // public function index()
-    // {
-    //     try {
-
-    //         $ticketOffers = TicketOffer::with('ticketOption' , 'purchasedTickets')->paginate(10);
-
-    //         return view('dashboard.ticketOffers.index', compact('ticketOffers'));
-    //     } catch (\Exception $e) {
-    //         return redirect()->route('ticketOptions.index')->with('error', 'Ticket Option not found.');
-    //     }
-    // }
+  
 
     
 public function index(Request $request)
